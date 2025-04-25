@@ -15,13 +15,13 @@ export default function BookScreen() {
       const res = await axios.get('http://ceprj.gachon.ac.kr:60001/api/api/v1/book/info', {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       setBook(res.data.data);
-      setLoading(false);
     } catch (err) {
       console.error('❌ 도서 정보 불러오기 실패:', err);
       Alert.alert('에러', '도서 정보를 불러오는 데 실패했습니다.');
       router.replace('/bookregister');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,9 +35,7 @@ export default function BookScreen() {
       await axios.patch(
         'http://ceprj.gachon.ac.kr:60001/api/api/v1/book',
         {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       Alert.alert('알림', '독서를 포기했습니다.');
       router.replace('/bookregister');
@@ -50,18 +48,19 @@ export default function BookScreen() {
   const handleComplete = async () => {
     try {
       const token = await SecureStore.getItemAsync('accessToken');
-      await axios.post(
+      const res = await axios.post(
         'http://ceprj.gachon.ac.kr:60001/api/api/v1/book/complete',
         {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      Alert.alert('축하합니다!', '독서를 완료했습니다.');
-      router.replace('/bookregister');
+      console.log('📘 독서 완료:', res.data);
+      router.push({
+        pathname: '/bookrecommend2',
+        params: { data: JSON.stringify(res.data.data) },
+      });
     } catch (error) {
-      console.error('❌ 독서 완료 실패:', error);
-      Alert.alert('실패', '독서 완료에 실패했습니다.');
+      console.error('❌ 독서 완료 처리 실패:', error.response?.data || error);
+      Alert.alert('오류', '도서 완료 처리 중 문제가 발생했습니다.');
     }
   };
 

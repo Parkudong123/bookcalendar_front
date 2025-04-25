@@ -10,20 +10,43 @@ import {
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
 export default function AIChatScreen() {
   const router = useRouter();
-  const [messages, setMessages] = useState([
-    { sender: 'ai', text: '나는 요즘 들어서 자기계발 서적에 관심을 가지기 시작했어. 하지만 자기계발 서적 안에 어떤 한 영역들이 있는지를 모르겠어' },
-    { sender: 'ai', text: '자기계발 영역에 관심이 가는구나! 자기계발 안에는 다음과 같은 영역들이 존재해!\n\n1. 시간 관리\n2. 동기부여 & 성공 철학\n3. 리더십 & 인간 관계\n4. 경제 & 재테크\n\n등등... 어떤 영역이 가장 관심이 가? 🤔' },
-    { sender: 'user', text: '위 예시 중에서 1번 항목에 대해 더욱 자세하게 설명해줄래?' },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
-    setMessages([...messages, { sender: 'user', text: input }]);
+
+    const newMessage = { sender: 'user', text: input };
+    setMessages(prev => [...prev, newMessage]);
+
+    try {
+      const token = await SecureStore.getItemAsync('accessToken');
+      const res = await axios.post(
+        'http://ceprj.gachon.ac.kr:60001/api/api/v1/chatbot/chat',
+        { chatMessage: input },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const aiResponse = res.data.data;
+      setMessages(prev => [...prev, { sender: 'ai', text: aiResponse }]);
+    } catch (error) {
+      console.error('❌ AI 응답 실패:', error.response?.data || error);
+    }
+
     setInput('');
+  };
+
+  const handleRecommend = () => {
+    router.push('/bookrecommend');
   };
 
   return (
@@ -69,7 +92,7 @@ export default function AIChatScreen() {
         </View>
 
         {/* 📚 도서 추천 받기 버튼 */}
-        <TouchableOpacity style={styles.recommendBtn}>
+        <TouchableOpacity style={styles.recommendBtn} onPress={handleRecommend}>
           <Text style={styles.recommendText}>도서 추천 받기</Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
