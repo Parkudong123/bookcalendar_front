@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'reac
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import jwtDecode from 'jwt-decode';
 
 export default function LoginScreen() {
   const router = useRouter();
