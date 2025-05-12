@@ -5,49 +5,96 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import { useRouter } from 'expo-router';
 
-export default function BookRecommend2() {
-  const router = useRouter();
-  const { data } = useLocalSearchParams();
-
+export default function BookRecommendScreen() {
   const [books, setBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    if (data) {
+    const fetchRecommendations = async () => {
       try {
-        const parsed = JSON.parse(data as string);
-        setBooks(parsed);
-      } catch (err) {
-        console.error('❌ 도서 추천 파싱 실패:', err);
+        const token = await SecureStore.getItemAsync('accessToken');
+        const res = await axios.get('http://ceprj.gachon.ac.kr:60001/api/api/v1/chatbot/recommend', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setBooks(res.data.data);
+      } catch (error) {
+        console.error('📚 도서 추천 불러오기 실패:', error);
+        Alert.alert('오류', '도서 추천을 불러오지 못했습니다.');
+      } finally {
+        setIsLoading(false);
       }
+    };
+
+    fetchRecommendations();
+  }, []);
+
+  const handleAddToCart = async (book) => {
+    try {
+      const token = await SecureStore.getItemAsync('accessToken');
+      await axios.post(
+        'http://ceprj.gachon.ac.kr:60001/api/api/v1/chatbot/cart',
+        {
+          bookName: book.bookName,
+          author: book.author,
+          url: book.url || '',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      Alert.alert('장바구니 추가 완료', `"${book.bookName}"이(가) 장바구니에 추가되었습니다.`);
+    } catch (err) {
+      console.error('🛒 장바구니 추가 실패:', err);
+      Alert.alert('오류', '장바구니 추가 중 문제가 발생했습니다.');
     }
-  }, [data]);
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>📘 추천 도서 리스트</Text>
-
-      {books.map((book, index) => (
-        <View key={index} style={styles.card}>
-          <View style={styles.headerRow}>
-            <View style={styles.circle}>
-              <Text style={styles.circleText}>{index + 1}</Text>
-            </View>
-            <View style={styles.textCol}>
-              <Text style={styles.bookTitle}>{book.bookName}</Text>
-              <Text style={styles.bookAuthor}>저자: {book.author}</Text>
-            </View>
-            <View style={styles.placeholder} />
-          </View>
-          <Text style={styles.reason}>{book.reason}</Text>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#8854d0" />
+          <Text style={styles.loadingText}>추천 도서 불러오는 중...</Text>
         </View>
-      ))}
+      ) : (
+        <>
+          <Text style={styles.title}>📘 추천 도서 리스트</Text>
 
-      <TouchableOpacity style={styles.backBtn} onPress={() => router.push('/main')}>
-        <Text style={styles.backText}>홈으로</Text>
-      </TouchableOpacity>
+          {books.map((book, index) => (
+            <View key={index} style={styles.card}>
+              <View style={styles.headerRow}>
+                <View style={styles.circle}>
+                  <Text style={styles.circleText}>{index + 1}</Text>
+                </View>
+                <View style={styles.textCol}>
+                  <Text style={styles.bookTitle}>{book.bookName}</Text>
+                  <Text style={styles.bookAuthor}>저자: {book.author}</Text>
+                </View>
+                <TouchableOpacity onPress={() => handleAddToCart(book)}>
+                  <Text style={styles.cartIcon}>🛒</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.reason}>{book.reason}</Text>
+            </View>
+          ))}
+
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.push('/main')}>
+            <Text style={styles.backBtnText}>홈으로</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -71,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 10,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -112,9 +159,9 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: '#333',
   },
-  placeholder: {
-    width: 30,
-    height: 30,
+  cartIcon: {
+    fontSize: 20,
+    padding: 4,
   },
   backBtn: {
     marginTop: 20,
@@ -122,9 +169,18 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 10,
   },
-  backText: {
+  backBtnText: {
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  loadingContainer: {
+    marginTop: 40,
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
   },
 });

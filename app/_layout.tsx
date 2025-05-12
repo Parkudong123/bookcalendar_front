@@ -31,10 +31,10 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="main" />           {/* 메인 (달력 등) */}
         <Stack.Screen name="(tabs)" />         {/* 하단 탭 라우팅 */}
         <Stack.Screen name="login" />          {/* 로그인 */}
         <Stack.Screen name="signup" />         {/* 회원가입 */}
-        <Stack.Screen name="main" />           {/* 메인 (달력 등) */}
         <Stack.Screen name="book" />           {/* 도서 정보 조회 */}
         <Stack.Screen name="bookregister" />   {/* 도서 등록 */}
         <Stack.Screen name="reviewquestion" /> {/* 질문 응답 페이지 */}

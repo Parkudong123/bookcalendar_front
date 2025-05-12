@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TextInput,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
@@ -16,20 +16,49 @@ export default function ScrapPage() {
   const [scraps, setScraps] = useState([]);
   const router = useRouter();
 
+  const fetchScraps = async () => {
+    try {
+      const token = await SecureStore.getItemAsync('accessToken');
+      const res = await axios.get('http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/scraps', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setScraps(res.data.data);
+    } catch (err) {
+      console.error('❌ 스크랩 불러오기 실패:', err);
+    }
+  };
+
   useEffect(() => {
-    const fetchScraps = async () => {
-      try {
-        const token = await SecureStore.getItemAsync('accessToken');
-        const res = await axios.get('http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/scraps', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setScraps(res.data.data);
-      } catch (err) {
-        console.error('❌ 스크랩 불러오기 실패:', err);
-      }
-    };
     fetchScraps();
   }, []);
+
+  const handleScrapPress = async (scrapId: number) => {
+    try {
+      const token = await SecureStore.getItemAsync('accessToken');
+      const res = await axios.get(`http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/scrap/${scrapId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const postId = res.data.data.postId;
+      router.push(`/post/${postId}`);
+    } catch (error) {
+      console.error('❌ 스크랩 상세조회 실패:', error);
+    }
+  };
+
+  const handleDeleteScrap = async (scrapId: number) => {
+    try {
+      const token = await SecureStore.getItemAsync('accessToken');
+      await axios.delete(`http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/scrap/${scrapId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setScraps(scraps.filter((s) => s.scrapId !== scrapId));
+      Alert.alert('삭제 완료', '스크랩이 삭제되었습니다.');
+    } catch (error) {
+      console.error('❌ 스크랩 삭제 실패:', error);
+      Alert.alert('삭제 실패', '스크랩 삭제 중 오류가 발생했습니다.');
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -37,35 +66,24 @@ export default function ScrapPage() {
         <Text style={styles.backText}>← 마이 페이지</Text>
       </TouchableOpacity>
 
-      <Text style={styles.header}>스크랩 페이지</Text>
-
-      <View style={styles.searchBox}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="도서 명 검색창"
-          editable={false} // 일단 비활성화
-        />
-        <TouchableOpacity style={styles.searchBtn}>
-          <Text style={styles.searchBtnText}>검색</Text>
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.header}>⭐ 스크랩 페이지 ⭐</Text>
 
       {scraps.map((item) => (
         <View key={item.scrapId} style={styles.itemBox}>
-          <View style={styles.itemContent}>
-            <Text style={styles.bookText}>Title : {item.title}</Text>
-            <Text style={styles.dateText}>Written by : {item.author}</Text>
-            <Text style={styles.dateText}>
-              Date : {new Date(item.dateTime).toISOString().slice(0, 10).replace(/-/g, '.')}
-            </Text>
-          </View>
-          <TouchableOpacity>
+          <TouchableOpacity style={{ flex: 1 }} onPress={() => handleScrapPress(item.scrapId)}>
+            <View style={styles.itemContent}>
+              <Text style={styles.bookText}>Title : {item.title}</Text>
+              <Text style={styles.dateText}>Written by : {item.author}</Text>
+              <Text style={styles.dateText}>
+                Date : {new Date(item.dateTime).toISOString().slice(0, 10).replace(/-/g, '.')}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleDeleteScrap(item.scrapId)}>
             <Text style={styles.deleteBtn}>🗑</Text>
           </TouchableOpacity>
         </View>
       ))}
-
-      <Text style={{ alignSelf: 'center', fontSize: 20, marginTop: 20 }}>⋯</Text>
     </ScrollView>
   );
 }
@@ -84,35 +102,10 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    backgroundColor: '#ddd',
     padding: 6,
     borderRadius: 6,
     alignSelf: 'center',
     marginBottom: 20,
-  },
-  searchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  searchInput: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginRight: 10,
-  },
-  searchBtn: {
-    backgroundColor: '#ccc',
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-  },
-  searchBtnText: {
-    color: '#333',
-    fontWeight: 'bold',
   },
   itemBox: {
     flexDirection: 'row',

@@ -30,7 +30,7 @@ export default function ReviewSummaryScreen() {
         <Text style={styles.label}>진행률</Text>
         <Text style={styles.value}>{Math.round(Number(progress))}%</Text>
 
-        <Text style={styles.label}>📅 마감 예정일</Text>
+        <Text style={styles.label}>마감 예정일</Text>
         <Text style={styles.value}>{finishDate}</Text>
 
         <Text style={styles.label}>남은 날짜</Text>

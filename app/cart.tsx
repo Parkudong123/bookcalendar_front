@@ -1,6 +1,6 @@
 // app/cart.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
@@ -8,7 +8,6 @@ import * as SecureStore from 'expo-secure-store';
 export default function CartPage() {
   const router = useRouter();
   const [cartItems, setCartItems] = useState([]);
-  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -26,6 +25,29 @@ export default function CartPage() {
     fetchCart();
   }, []);
 
+  const handleDelete = async (cartId: number) => {
+    Alert.alert('삭제 확인', '해당 도서를 장바구니에서 삭제하시겠습니까?', [
+      { text: '취소', style: 'cancel' },
+      {
+        text: '삭제',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const token = await SecureStore.getItemAsync('accessToken');
+            await axios.delete(`http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/cart/${cartId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
+            Alert.alert('삭제 완료', '도서가 장바구니에서 삭제되었습니다.');
+          } catch (err) {
+            console.error('❌ 삭제 실패:', err);
+            Alert.alert('오류', '삭제 중 문제가 발생했습니다.');
+          }
+        },
+      },
+    ]);
+  };
+
   const formatDate = (isoDate: string) => {
     const date = new Date(isoDate);
     return `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`;
@@ -37,37 +59,23 @@ export default function CartPage() {
         <Text style={styles.backText}>← 마이 페이지</Text>
       </TouchableOpacity>
 
-      <Text style={styles.header}>내 장바구니 목록</Text>
-
-      <View style={styles.searchBox}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="도서 명 검색창"
-          value={search}
-          onChangeText={setSearch}
-        />
-        <TouchableOpacity style={styles.searchButton}>
-          <Text style={{ color: '#333' }}>검색</Text>
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.header}>🛒 내 장바구니 목록</Text>
 
       {cartItems.map((item) => (
         <View key={item.cartId} style={styles.card}>
           <View>
-            <Text style={styles.cardText}>Book Name : {item.bookName}</Text>
-            <Text style={styles.cardText}>Author : {item.author}</Text>
-            <Text style={styles.dateText}>Added : {formatDate(item.date)}</Text>
+            <Text style={styles.cardText}>책 제목 : {item.bookName}</Text>
+            <Text style={styles.cardText}>저자 : {item.author}</Text>
+            <Text style={styles.dateText}>추가한 날짜 : {formatDate(item.date)}</Text>
           </View>
-          <TouchableOpacity>
-            <Image source={require('../image/logo.png')} style={styles.icon} />
+          <TouchableOpacity onPress={() => handleDelete(item.cartId)}>
+            <Text style={styles.deleteIcon}>🗑</Text>
           </TouchableOpacity>
         </View>
       ))}
 
-      <Text style={styles.pageDots}>• • •</Text>
-
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText}>ADD Book</Text>
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push('/cartadd')}>
+        <Text style={styles.addButtonText}>도서 추가</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -82,7 +90,7 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     position: 'absolute',
-    top: 40,
+    top: 50,
     left: 20,
     zIndex: 10,
   },
@@ -95,34 +103,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginVertical: 16,
-    backgroundColor: '#ddd',
     paddingVertical: 6,
     borderRadius: 6,
-  },
-  searchBox: {
-    flexDirection: 'row',
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  searchInput: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginRight: 8,
-    borderColor: '#ccc',
-    borderWidth: 1,
-  },
-  searchButton: {
-    backgroundColor: '#eee',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
   },
   card: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: '#333',
     padding: 16,
     borderRadius: 8,
@@ -136,16 +123,10 @@ const styles = StyleSheet.create({
     color: '#bbb',
     fontSize: 11,
   },
-  icon: {
-    width: 20,
-    height: 20,
-    tintColor: '#fff',
-  },
-  pageDots: {
-    textAlign: 'center',
+  deleteIcon: {
     fontSize: 20,
-    marginTop: 20,
-    color: '#888',
+    color: '#fff',
+    padding: 4,
   },
   addButton: {
     backgroundColor: '#e2d9f9',

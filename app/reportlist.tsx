@@ -6,7 +6,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -16,7 +15,6 @@ import * as SecureStore from 'expo-secure-store';
 export default function ReportListScreen() {
   const router = useRouter();
   const [reports, setReports] = useState([]);
-  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -65,13 +63,6 @@ export default function ReportListScreen() {
 
       <Text style={styles.header}>내 독후감 목록</Text>
 
-      <TextInput
-        style={styles.searchInput}
-        placeholder="책 제목 검색 (미구현)"
-        value={search}
-        onChangeText={setSearch}
-      />
-
       {reports.length === 0 ? (
         <Text style={styles.noDataText}>작성한 독후감이 없습니다.</Text>
       ) : (
@@ -101,7 +92,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingTop: 100,
-    paddingBottom: 60,
+    paddingBottom: 500,
     backgroundColor: '#fff',
   },
   backBtn: {
@@ -119,13 +110,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 25,
-  },
-  searchInput: {
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 14,
-    marginBottom: 16,
   },
   noDataText: {
     textAlign: 'center',

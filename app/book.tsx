@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  ScrollView,
+  TextInput,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
@@ -16,8 +25,8 @@ export default function BookScreen() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBook(res.data.data);
-    } catch (err) {
-      console.error('❌ 도서 정보 불러오기 실패:', err);
+    } catch (err: any) {
+      console.error('❌ 도서 정보 불러오기 실패:', err.response?.data || err);
       Alert.alert('에러', '도서 정보를 불러오는 데 실패했습니다.');
       router.replace('/bookregister');
     } finally {
@@ -30,38 +39,59 @@ export default function BookScreen() {
   }, []);
 
   const handleGiveUp = async () => {
-    try {
-      const token = await SecureStore.getItemAsync('accessToken');
-      await axios.patch(
-        'http://ceprj.gachon.ac.kr:60001/api/api/v1/book',
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      Alert.alert('알림', '독서를 포기했습니다.');
-      router.replace('/bookregister');
-    } catch (error) {
-      console.error('❌ 독서 포기 실패:', error);
-      Alert.alert('실패', '독서 포기에 실패했습니다.');
-    }
+     Alert.alert('독서 포기', '정말로 독서를 포기하시겠습니까? 등록된 도서 정보가 삭제됩니다.', [
+      { text: '취소', style: 'cancel' },
+      {
+        text: '포기',
+        style: 'destructive',
+        onPress: async () => {
+           try {
+              const token = await SecureStore.getItemAsync('accessToken');
+              await axios.patch(
+                'http://ceprj.gachon.ac.kr:60001/api/api/v1/book',
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              Alert.alert('알림', '독서를 포기했습니다.');
+              router.replace('/bookregister');
+            } catch (error: any) {
+              console.error('❌ 독서 포기 실패:', error.response?.data || error);
+               const errorMessage = error.response?.data?.message || '독서 포기에 실패했습니다.';
+              Alert.alert('실패', errorMessage);
+            }
+        }
+      }
+    ]);
   };
 
   const handleComplete = async () => {
-    try {
-      const token = await SecureStore.getItemAsync('accessToken');
-      const res = await axios.post(
-        'http://ceprj.gachon.ac.kr:60001/api/api/v1/book/complete',
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log('📘 독서 완료:', res.data);
-      router.push({
-        pathname: '/bookrecommend2',
-        params: { data: JSON.stringify(res.data.data) },
-      });
-    } catch (error) {
-      console.error('❌ 독서 완료 처리 실패:', error.response?.data || error);
-      Alert.alert('오류', '도서 완료 처리 중 문제가 발생했습니다.');
-    }
+     Alert.alert('독서 완료', '독서를 완료하셨습니까? 완료 처리 후에는 수정할 수 없습니다.', [
+      { text: '취소', style: 'cancel' },
+      {
+        text: '완료',
+        onPress: async () => {
+           try {
+              const token = await SecureStore.getItemAsync('accessToken');
+              const res = await axios.post(
+                'http://ceprj.gachon.ac.kr:60001/api/api/v1/book/complete',
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              
+
+              router.push({
+                pathname: '/bookrecommend2',
+                params: { data: JSON.stringify(res.data.data) },
+              });
+
+           } catch (error: any) {
+              console.error('❌ 독서 완료 처리 실패:', error.response?.data || error);
+               const errorMessage = error.response?.data?.message || '도서 완료 처리 중 문제가 발생했습니다.';
+              Alert.alert('오류', errorMessage);
+            }
+        }
+      }
+    ]);
   };
 
   if (loading) {
@@ -72,103 +102,146 @@ export default function BookScreen() {
     );
   }
 
+   if (!book) {
+       return (
+           <View style={styles.loadingContainer}>
+               <Text>도서 정보가 없습니다.</Text>
+               <TouchableOpacity onPress={() => router.replace('/bookregister')} style={{marginTop: 20, padding: 10, backgroundColor: '#6b4eff', borderRadius: 5}}>
+                   <Text style={{color: '#fff'}}>도서 등록하러 가기</Text>
+               </TouchableOpacity>
+           </View>
+       );
+   }
+
+
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => router.push('/main')} style={styles.backButton}>
-        <Text style={styles.backButtonText}>← 뒤로가기</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <TouchableOpacity onPress={() => router.push('/main')} style={styles.backBtn}>
+        <Text style={styles.backText}>← 뒤로가기</Text>
       </TouchableOpacity>
 
-      <Text style={styles.header}>📚 등록된 도서 정보</Text>
+      <Text style={styles.header}>📚 현재 읽는 도서</Text>
 
-      {book && (
-        <View style={styles.infoBox}>
-          <Text style={styles.label}>제목: <Text style={styles.value}>{book.bookName}</Text></Text>
-          <Text style={styles.label}>저자: <Text style={styles.value}>{book.author}</Text></Text>
-          <Text style={styles.label}>장르: <Text style={styles.value}>{book.genre}</Text></Text>
-          <Text style={styles.label}>총 페이지 수: <Text style={styles.value}>{book.totalPage}</Text></Text>
-          <Text style={styles.label}>시작일: <Text style={styles.value}>{book.startDate}</Text></Text>
-          <Text style={styles.label}>종료일: <Text style={styles.value}>{book.finishDate}</Text></Text>
+      <View style={styles.fieldBox}>
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>제목</Text>
+          <TextInput value={book.bookName} editable={false} style={styles.input} />
         </View>
-      )}
+
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>저자</Text>
+          <TextInput value={book.author} editable={false} style={styles.input} />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>장르</Text>
+          <TextInput value={book.genre} editable={false} style={styles.input} />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>총 페이지 수</Text>
+          <TextInput value={book.totalPage?.toString()} editable={false} style={styles.input} />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>시작일</Text>
+          <TextInput value={book.startDate ?? '날짜 정보 없음'} editable={false} style={styles.input} />
+        </View>
+
+         {book.finishDate && (
+           <View style={styles.fieldGroup}>
+            <Text style={styles.label}>종료일</Text>
+            <TextInput value={book.finishDate ?? '날짜 정보 없음'} editable={false} style={styles.input} />
+          </View>
+         )}
+      </View>
 
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.giveUpButton} onPress={handleGiveUp}>
-          <Text style={styles.buttonText}>독서 포기</Text>
+        <TouchableOpacity style={[styles.buttonBase, styles.giveUpButton]} onPress={handleGiveUp}>
+           <Text style={styles.buttonText}>독서 포기</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.completeButton} onPress={handleComplete}>
+
+        <TouchableOpacity style={[styles.buttonBase, styles.completeButton]} onPress={handleComplete}>
           <Text style={styles.buttonText}>독서 완료</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
-    backgroundColor: '#f8f7fa',
-    flex: 1,
+    paddingHorizontal: 20,
     paddingTop: 100,
+    paddingBottom: 60,
+    backgroundColor: '#f4f4f4',
+    flexGrow: 1,
   },
-  loadingContainer: {
+   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f4f4f4',
   },
-  backButton: {
-    marginBottom: 30,
-    alignSelf: 'flex-start',
+  backBtn: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 10,
   },
-  backButtonText: {
-    color: '#666',
-    fontSize: 14,
+  backText: {
+    fontSize: 16,
+    color: '#6b4eff',
   },
   header: {
-    fontSize: 25,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 50,
     textAlign: 'center',
+    marginBottom: 30,
+    color: '#333',
   },
-  infoBox: {
+  fieldBox: {
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 10,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 80,
+    borderRadius: 12,
+    marginBottom: 30,
+  },
+  fieldGroup: {
+    marginBottom: 16,
   },
   label: {
-    fontWeight: 'bold',
-    lineHeight: 40,
-    fontSize: 20,
-    marginBottom: 5,
-    color: '#444',
+    fontSize: 13,
+    color: '#666',
+    marginBottom: 6,
   },
-  value: {
-    fontWeight: 'normal',
-    color: '#222',
+  input: {
+    backgroundColor: '#eee',
+    padding: 12,
+    borderRadius: 8,
+    fontSize: 14,
+    color: '#333',
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  buttonBase: {
+     flex: 1,
+     paddingVertical: 12,
+     borderRadius: 8,
+  },
   giveUpButton: {
-    flex: 1,
-    backgroundColor: '#ddd',
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: '#ff4d4d',
     marginRight: 8,
   },
   completeButton: {
-    flex: 1,
     backgroundColor: '#6b4eff',
-    paddingVertical: 12,
-    borderRadius: 8,
     marginLeft: 8,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
+    fontSize: 16,
   },
 });

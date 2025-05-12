@@ -1,4 +1,3 @@
-// app/na5.tsx
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -28,11 +27,21 @@ export default function MyPageScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchUserInfo();
+      const checkTokenAndFetch = async () => {
+        const token = await SecureStore.getItemAsync('accessToken');
+        if (!token) {
+          router.replace('/login'); // 뒤로가기로도 접근 방지
+        } else {
+          fetchUserInfo();
+        }
+      };
+
+      checkTokenAndFetch();
     }, [])
   );
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await SecureStore.deleteItemAsync('accessToken');
     router.replace('/login');
   };
 
@@ -61,10 +70,10 @@ export default function MyPageScreen() {
       <TouchableOpacity style={styles.button} onPress={() => router.push('/scrap')}>
         <Text style={styles.buttonText}>스크랩 페이지</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}onPress={() => router.push('/cart')}>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/cart')}>
         <Text style={styles.buttonText}>내 장바구니 목록</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}onPress={() => router.push('/challenge')}>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/challenge')}>
         <Text style={styles.buttonText}>독서 챌린지 페이지</Text>
       </TouchableOpacity>
 
@@ -78,7 +87,8 @@ export default function MyPageScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingTop: 100,paddingBottom: 200,
+    paddingTop: 100,
+    paddingBottom: 200,
     backgroundColor: '#fff',
   },
   backBtn: {

@@ -46,14 +46,15 @@ export default function ReviewDetailScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-        <Text style={styles.backText}>← 돌아가기</Text>
+        <Text style={styles.backText}>← 메인페이지로</Text>
       </TouchableOpacity>
 
       <Text style={styles.title}>{date} 독후감</Text>
-      <Text style={styles.label}>독후감 내용 :</Text>
-<View style={styles.box}>
-  <Text style={styles.content}>{review.contents}</Text>
-</View>
+
+      <Text style={styles.label}>📗 독후감 내용</Text>
+      <View style={styles.box}>
+        <Text style={styles.content}>{review.contents}</Text>
+      </View>
 
       {[1, 2, 3].map(i => (
         <View key={i} style={styles.qaBox}>
@@ -62,15 +63,26 @@ export default function ReviewDetailScreen() {
         </View>
       ))}
 
-      <Text style={styles.aiTitle}>🤖 AI의 응답</Text>
-      <Text style={styles.aiResponse}>{review.aiResponse}</Text>
+      <View style={styles.aiBox}>
+        <Text style={styles.aiTitle}>🤖 AI 사서의 응답</Text>
+        <Text style={styles.aiResponse}>{review.aiResponse}</Text>
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 24, backgroundColor: '#f8f7fa', flexGrow: 1 },
-  title: { fontSize: 30, fontWeight: 'bold', marginBottom: 12,marginTop:20 },
+  container: {
+    padding: 24,
+    backgroundColor: '#f8f7fa',
+    flexGrow: 1,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    marginTop: 20,
+  },
   box: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -78,20 +90,68 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#fff',
     marginBottom: 20,
-    marginTop: 10
+    marginTop: 10,
   },
   content: {
     fontSize: 14,
     color: '#333',
     lineHeight: 22,
   },
-  
-  qaBox: { marginBottom: 20 },
-  question: { fontWeight: 'bold', color: '#444' },
-  answer: { marginTop: 4, color: '#333' },
-  aiTitle: { fontSize: 16, fontWeight: 'bold', marginTop: 24, marginBottom: 6 },
-  aiResponse: { fontSize: 14, color: '#333' },
-  noData: { textAlign: 'center', marginTop: 40, color: '#777' },
-  backBtn: { marginTop: 40 },
-  backText: { color: '#666' },
+  qaBox: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  question: {
+    fontWeight: 'bold',
+    fontSize: 15,
+    color: '#444',
+    marginBottom: 6,
+  },
+  answer: {
+    fontSize: 14,
+    color: '#3b53ff',
+    lineHeight: 20,
+  },
+  aiBox: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 10,
+    marginBottom: 24,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  aiTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  aiResponse: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20,
+  },
+  noData: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: '#777',
+  },
+  backBtn: {
+    marginTop: 40,
+  },
+  backText: {
+    color: '#666',
+  },
 });

@@ -32,6 +32,7 @@ export default function BookReviewScreen() {
     }
 
     const token = await SecureStore.getItemAsync('accessToken');
+    console.log('🧪 na2.tsx 토큰:', token);
     try {
       const res = await axios.post(
         'http://ceprj.gachon.ac.kr:60001/api/api/v1/review/write',
@@ -65,14 +66,14 @@ export default function BookReviewScreen() {
       });
     } catch (error) {
       console.error('❌ 독후감 등록 실패:', error);
-      Alert.alert('실패', '독후감 등록에 실패했습니다.');
+      Alert.alert('실패', '독후감 등록에 오류가 발생하였습니다.');
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={() => router.push('/main')} style={styles.backButton}>
-        <Text style={styles.backButtonText}>← 메인페이지로</Text>
+        <Text style={styles.backButtonText}>← 돌아가기</Text>
       </TouchableOpacity>
 
       <Text style={styles.header}>📚 Daily 독후감 기록</Text>
@@ -87,7 +88,7 @@ export default function BookReviewScreen() {
 
       <Text style={styles.label}>오늘 읽은 페이지</Text>
       <TextInput
-        placeholder="예: 30"
+        placeholder="예 : 30 "
         style={styles.input}
         keyboardType="numeric"
         value={currentPage}

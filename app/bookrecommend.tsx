@@ -1,13 +1,20 @@
-// app/bookrecommend.tsx
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
 
 export default function BookRecommendScreen() {
   const [books, setBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,11 +29,37 @@ export default function BookRecommendScreen() {
         setBooks(res.data.data);
       } catch (error) {
         console.error('📚 도서 추천 불러오기 실패:', error);
+        Alert.alert('오류', '도서 추천을 불러오지 못했습니다.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchRecommendations();
   }, []);
+
+  const handleAddToCart = async (book) => {
+    try {
+      const token = await SecureStore.getItemAsync('accessToken');
+      await axios.post(
+        'http://ceprj.gachon.ac.kr:60001/api/api/v1/chatbot/cart',
+        {
+          bookName: book.bookName,
+          author: book.author,
+          url: book.url || '',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      Alert.alert('장바구니 추가 완료', `"${book.bookName}"이(가) 장바구니에 추가되었습니다.`);
+    } catch (err) {
+      console.error('🛒 장바구니 추가 실패:', err);
+      Alert.alert('오류', '장바구니 추가 중 문제가 발생했습니다.');
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -34,24 +67,34 @@ export default function BookRecommendScreen() {
         <Text style={styles.backText}>← AI 챗봇으로 돌아가기</Text>
       </TouchableOpacity>
 
-      {books.map((book, index) => (
-        <View key={index} style={styles.card}>
-          <View style={styles.header}>
-            <View style={styles.circle}>
-              <Text style={styles.circleText}>{index + 1}</Text>
-            </View>
-            <View style={styles.titleBox}>
-              <Text style={styles.bookTitle}>{book.bookName}</Text>
-              <Text style={styles.author}>{book.author}</Text>
-            </View>
-            <View style={styles.iconBox}>
-              <View style={styles.iconPlaceholder} />
-              <View style={styles.iconPlaceholder} />
-            </View>
-          </View>
-          <Text style={styles.reason}>{book.reason}</Text>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#8854d0" />
+          <Text style={styles.loadingText}>추천 도서 불러오는 중...</Text>
         </View>
-      ))}
+      ) : (
+        <>
+          <Text style={styles.title}>📘 추천 도서 리스트</Text>
+
+          {books.map((book, index) => (
+            <View key={index} style={styles.card}>
+              <View style={styles.headerRow}>
+                <View style={styles.circle}>
+                  <Text style={styles.circleText}>{index + 1}</Text>
+                </View>
+                <View style={styles.textCol}>
+                  <Text style={styles.bookTitle}>{book.bookName}</Text>
+                  <Text style={styles.bookAuthor}>저자: {book.author}</Text>
+                </View>
+                <TouchableOpacity onPress={() => handleAddToCart(book)}>
+                  <Text style={styles.cartIcon}>🛒</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.reason}>{book.reason}</Text>
+            </View>
+          ))}
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -67,62 +110,76 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#555',
     fontWeight: '600',
-    marginBottom: 20,
+    marginBottom: 8,
     backgroundColor: '#eee',
     padding: 8,
     borderRadius: 10,
   },
+  title: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    padding: 6,
+    backgroundColor: '#eee',
+    borderRadius: 8,
+  },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 10,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
     elevation: 2,
   },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   circle: {
+    backgroundColor: '#d8d1ff',
+    borderRadius: 20,
     width: 32,
     height: 32,
-    borderRadius: 16,
-    backgroundColor: '#ddd',
     justifyContent: 'center',
     alignItems: 'center',
   },
   circleText: {
-    color: '#555',
     fontWeight: 'bold',
+    color: '#444',
   },
-  titleBox: {
+  textCol: {
+    marginLeft: 12,
     flex: 1,
-    marginLeft: 10,
   },
   bookTitle: {
     fontWeight: 'bold',
     fontSize: 15,
+    marginBottom: 2,
   },
-  author: {
-    fontSize: 12,
-    color: '#888',
+  bookAuthor: {
+    color: '#666',
+    fontSize: 13,
   },
   reason: {
-    fontSize: 13,
-    color: '#333',
-    marginTop: 8,
+    fontSize: 14,
     lineHeight: 20,
+    color: '#333',
   },
-  iconBox: {
-    flexDirection: 'row',
-    gap: 4,
+  cartIcon: {
+    fontSize: 20,
+    padding: 4,
   },
-  iconPlaceholder: {
-    width: 20,
-    height: 20,
-    backgroundColor: '#ccc',
-    borderRadius: 4,
-    marginLeft: 6,
+  loadingContainer: {
+    marginTop: 60,
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#666',
   },
 });

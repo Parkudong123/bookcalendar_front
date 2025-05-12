@@ -52,7 +52,7 @@ export default function ReviewQuestionScreen() {
         }
       );
 
-      console.log('✅ 질문 응답 성공:', res.data);
+      
 
       // 응답 받은 독서 요약 데이터 reviewsummary로 전달
       const summary = res.data.data;
@@ -79,7 +79,8 @@ export default function ReviewQuestionScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>📖 감상 질문에 답변해보세요</Text>
 
-      <Text style={styles.question}>{q1}</Text>
+      {/* Q1. 접두사 추가 */}
+      <Text style={styles.question}>Q1. {q1}</Text>
       <TextInput
         style={styles.input}
         multiline
@@ -88,7 +89,8 @@ export default function ReviewQuestionScreen() {
         placeholder="답변을 입력하세요"
       />
 
-      <Text style={styles.question}>{q2}</Text>
+      {/* Q2. 접두사 추가 */}
+      <Text style={styles.question}>Q2. {q2}</Text>
       <TextInput
         style={styles.input}
         multiline
@@ -97,7 +99,8 @@ export default function ReviewQuestionScreen() {
         placeholder="답변을 입력하세요"
       />
 
-      <Text style={styles.question}>{q3}</Text>
+      {/* Q3. 접두사 추가 */}
+      <Text style={styles.question}>Q3. {q3}</Text>
       <TextInput
         style={styles.input}
         multiline
@@ -123,7 +126,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 60,
+    marginBottom: 30,
     textAlign: 'center',
   },
   question: {
@@ -137,14 +140,15 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 10,
     backgroundColor: '#fff',
-    marginBottom: 30,
+    marginBottom: 20,
     textAlignVertical: 'top',
-    minHeight: 100,
+    height: 120, 
   },
   button: {
     backgroundColor: '#6b4eff',
     paddingVertical: 12,
     borderRadius: 8,
+    marginBottom :50 ,
   },
   buttonText: {
     color: '#fff',
