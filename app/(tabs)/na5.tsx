@@ -54,7 +54,7 @@ export default function MyPageScreen() {
       <Text style={styles.header}>마이 페이지</Text>
 
       <View style={styles.profileBox}>
-        <Image source={require('../..//image/logo.png')} style={styles.avatar} />
+        <Image source={require('../..//image/people2.png')} style={styles.avatar} />
         <View>
           <Text style={styles.nickname}>{nickname || '닉네임 불러오는 중...'}</Text>
           <Text style={styles.rank}>Rank: 상위 {rank !== null ? rank : '?'}% User</Text>

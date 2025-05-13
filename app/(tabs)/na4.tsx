@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#eee',
         borderRadius: 8,
         fontWeight: 'bold',
-        fontSize: 15,
+        fontSize: 20
     },
     searchRow: {
         flexDirection: 'row',

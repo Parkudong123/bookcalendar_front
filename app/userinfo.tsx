@@ -49,7 +49,7 @@ export default function UserDetailScreen() {
         <Text style={styles.backText}>← 마이 페이지</Text>
       </TouchableOpacity>
 
-      <Image source={require('..//image/logo.png')} style={styles.avatar} />
+      <Image source={require('..//image/people2.png')} style={styles.avatar} />
 
       <View style={styles.fieldBox}>
         <View style={styles.fieldGroup}>

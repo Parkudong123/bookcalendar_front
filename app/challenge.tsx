@@ -4,9 +4,9 @@ import { useRouter } from 'expo-router';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-import BronzeMedal from '../image/bronze.png';
-import SilverMedal from '../image/silver.png';
-import GoldMedal from '../image/gold.png';
+import BronzeMedal from '../image/bronze1.png';
+import SilverMedal from '../image/silver1.png';
+import GoldMedal from '../image/gold1.png';
 
 export default function ChallengeScreen() {
   const router = useRouter();
@@ -84,7 +84,7 @@ export default function ChallengeScreen() {
         <Text style={styles.backText}>← 마이 페이지</Text>
       </TouchableOpacity>
 
-      <Text style={styles.header}>독후감 작성 Challenge</Text>
+      <Text style={styles.header}>🏆 독후감 작성 Challenge</Text>
       <Text style={styles.bookCount}>현재 내 독서 권수 : {bookCount} 권</Text>
       <Text style={styles.bookCount}>현재 내 독후감 작성 수 : {reviewCount} 개</Text>
 
@@ -180,10 +180,13 @@ const styles = StyleSheet.create({
     color: '#6b4eff',
   },
   header: {
-    fontSize: 24,
-    fontWeight: '600',
     textAlign: 'center',
-    marginBottom: 20,
+        marginBottom: 16,
+        padding: 8,
+        backgroundColor: '#eee',
+        borderRadius: 8,
+        fontWeight: 'bold',
+        fontSize: 20,
   },
   bookCount: {
     fontSize: 18,

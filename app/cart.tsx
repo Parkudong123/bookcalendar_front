@@ -1,4 +1,3 @@
-// app/cart.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -25,7 +24,7 @@ export default function CartPage() {
     fetchCart();
   }, []);
 
-  const handleDelete = async (cartId: number) => {
+  const handleDelete = async (cartId) => {
     Alert.alert('삭제 확인', '해당 도서를 장바구니에서 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       {
@@ -41,14 +40,15 @@ export default function CartPage() {
             Alert.alert('삭제 완료', '도서가 장바구니에서 삭제되었습니다.');
           } catch (err) {
             console.error('❌ 삭제 실패:', err);
-            Alert.alert('오류', '삭제 중 문제가 발생했습니다.');
+            const errorMessage = err.response?.data?.message || '삭제 중 문제가 발생했습니다.';
+            Alert.alert('오류', errorMessage);
           }
         },
       },
     ]);
   };
 
-  const formatDate = (isoDate: string) => {
+  const formatDate = (isoDate) => {
     const date = new Date(isoDate);
     return `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`;
   };
@@ -61,18 +61,23 @@ export default function CartPage() {
 
       <Text style={styles.header}>🛒 내 장바구니 목록</Text>
 
-      {cartItems.map((item) => (
-        <View key={item.cartId} style={styles.card}>
-          <View>
-            <Text style={styles.cardText}>책 제목 : {item.bookName}</Text>
-            <Text style={styles.cardText}>저자 : {item.author}</Text>
-            <Text style={styles.dateText}>추가한 날짜 : {formatDate(item.date)}</Text>
+      {cartItems.length === 0 ? (
+         <Text style={styles.noDataText}>장바구니가 비어있습니다.</Text>
+      ) : (
+        cartItems.map((item) => (
+          <View key={item.cartId} style={styles.card}>
+            <View>
+              <Text style={styles.cardText}>책 제목 : {item.bookName}</Text>
+              <Text style={styles.cardText}>저자 : {item.author}</Text>
+              <Text style={styles.dateText}>추가한 날짜 : {formatDate(item.date)}</Text>
+            </View>
+            <TouchableOpacity onPress={() => handleDelete(item.cartId)}>
+              <Text style={styles.deleteIcon}>🗑</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => handleDelete(item.cartId)}>
-            <Text style={styles.deleteIcon}>🗑</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
+        ))
+      )}
+
 
       <TouchableOpacity style={styles.addButton} onPress={() => router.push('/cartadd')}>
         <Text style={styles.addButtonText}>도서 추가</Text>
@@ -85,7 +90,7 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: 80,
     paddingHorizontal: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f4f4f4',
     paddingBottom: 100,
   },
   backBtn: {
@@ -99,34 +104,41 @@ const styles = StyleSheet.create({
     color: '#6b4eff',
   },
   header: {
-    fontSize: 24,
-    fontWeight: '600',
     textAlign: 'center',
-    marginVertical: 16,
-    paddingVertical: 6,
-    borderRadius: 6,
+        marginBottom: 16,
+        padding: 8,
+        backgroundColor: '#eee',
+        borderRadius: 8,
+        fontWeight: 'bold',
+        fontSize: 20,
   },
   card: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#333',
+    backgroundColor: '#fff',
     padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
+    borderRadius: 10,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   cardText: {
-    color: '#fff',
+    color: '#333',
     marginBottom: 4,
   },
   dateText: {
-    color: '#bbb',
+    color: '#666',
     fontSize: 11,
   },
   deleteIcon: {
     fontSize: 20,
-    color: '#fff',
+    color: '#444',
     padding: 4,
+    marginLeft: 10,
   },
   addButton: {
     backgroundColor: '#e2d9f9',
@@ -138,5 +150,10 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#333',
     fontWeight: '600',
+  },
+   noDataText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#888',
   },
 });

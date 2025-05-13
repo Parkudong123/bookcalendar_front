@@ -66,16 +66,16 @@ export default function ScrapPage() {
         <Text style={styles.backText}>← 마이 페이지</Text>
       </TouchableOpacity>
 
-      <Text style={styles.header}>⭐ 스크랩 페이지 ⭐</Text>
+      <Text style={styles.header}>⭐ 스크랩 페이지</Text>
 
       {scraps.map((item) => (
         <View key={item.scrapId} style={styles.itemBox}>
           <TouchableOpacity style={{ flex: 1 }} onPress={() => handleScrapPress(item.scrapId)}>
             <View style={styles.itemContent}>
-              <Text style={styles.bookText}>Title : {item.title}</Text>
-              <Text style={styles.dateText}>Written by : {item.author}</Text>
+              <Text style={styles.bookText}>책 제목 : {item.title}</Text>
+              <Text style={styles.dateText}>작성자 : {item.author}</Text>
               <Text style={styles.dateText}>
-                Date : {new Date(item.dateTime).toISOString().slice(0, 10).replace(/-/g, '.')}
+                작성 날짜 : {new Date(item.dateTime).toISOString().slice(0, 10).replace(/-/g, '.')}
               </Text>
             </View>
           </TouchableOpacity>
@@ -100,34 +100,40 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    padding: 6,
-    borderRadius: 6,
-    alignSelf: 'center',
-    marginBottom: 20,
+    textAlign: 'center',
+        marginBottom: 16,
+        padding: 8,
+        backgroundColor: '#eee',
+        borderRadius: 8,
+        fontWeight: 'bold',
+        fontSize: 20,
   },
   itemBox: {
     flexDirection: 'row',
-    backgroundColor: '#333',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 16,
     alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   itemContent: {
     flex: 1,
   },
   bookText: {
-    color: '#fff',
+    color: '#333',
     fontWeight: 'bold',
   },
   dateText: {
-    color: '#ccc',
+    color: '#666',
     fontSize: 13,
   },
   deleteBtn: {
-    color: '#fff',
+    color: '#666',
     fontSize: 20,
     marginLeft: 10,
   },

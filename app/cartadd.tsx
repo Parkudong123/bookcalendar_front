@@ -1,4 +1,3 @@
-// app/cartadd.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import axios from 'axios';
@@ -13,8 +12,9 @@ export default function CartAddPage() {
   const [url, setUrl] = useState('');
 
   const handleSubmit = async () => {
-    if (!bookName || !author || !url) {
-      Alert.alert('입력 오류', '모든 항목을 입력해주세요.');
+    // URL 유효성 검사 제외 - 책 제목과 작가만 필수로 체크
+    if (!bookName || !author) {
+      Alert.alert('입력 오류', '책 제목과 작가를 모두 입력해주세요.'); // 알림 메시지 수정
       return;
     }
 
@@ -22,14 +22,15 @@ export default function CartAddPage() {
       const token = await SecureStore.getItemAsync('accessToken');
       const res = await axios.post(
         'http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/cart',
-        { bookName, author, url },
+        { bookName, author, url }, // URL은 입력되지 않으면 빈 문자열로 전송됩니다.
         { headers: { Authorization: `Bearer ${token}` } }
       );
       Alert.alert('도서 등록 완료', '장바구니에 도서가 추가되었습니다.');
       router.push('/cart');
     } catch (err) {
       console.error('❌ 도서 등록 실패:', err);
-      Alert.alert('등록 실패', '도서 추가 중 문제가 발생했습니다.');
+      const errorMessage = err.response?.data?.message || '도서 추가 중 문제가 발생했습니다.';
+      Alert.alert('등록 실패', errorMessage);
     }
   };
 
@@ -60,7 +61,7 @@ export default function CartAddPage() {
       <Text style={styles.label}>URL</Text>
       <TextInput
         style={styles.input}
-        placeholder="도서 링크 입력"
+        placeholder="도서 링크 입력 (선택 사항)" // 사용자에게 선택 사항임을 알림
         value={url}
         onChangeText={setUrl}
       />

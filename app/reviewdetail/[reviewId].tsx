@@ -1,4 +1,3 @@
-// app/reviewdetail/[reviewId].tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -34,7 +33,7 @@ export default function ReviewDetailScreen() {
     fetchReviewDetail();
   }, []);
 
-  if (loading) return <ActivityIndicator style={{ marginTop: 100 }} />;
+  if (loading) return <ActivityIndicator style={{ flex: 1 }} size="large" color="#6b4eff" />;
 
   if (!review) {
     return (
@@ -53,27 +52,27 @@ export default function ReviewDetailScreen() {
       <Text style={styles.title}>📘 독후감 상세보기</Text>
 
       <View style={styles.section}>
-        <Text style={styles.label}>내용</Text>
+        <Text style={styles.label}>독후감 내용</Text>
         <Text style={styles.value}>{review.contents}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>{review.question1}</Text>
+        <Text style={styles.label}>Q1. {review.question1}</Text>
         <Text style={styles.value}>{review.answer1}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>{review.question2}</Text>
+        <Text style={styles.label}>Q2. {review.question2}</Text>
         <Text style={styles.value}>{review.answer2}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>{review.question3}</Text>
+        <Text style={styles.label}>Q3. {review.question3}</Text>
         <Text style={styles.value}>{review.answer3}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>📊 AI 분석</Text>
+        <Text style={styles.label}>📊 AI 사서의 분석</Text>
         <Text style={styles.value}>{review.aiResponse}</Text>
       </View>
     </ScrollView>
@@ -110,7 +109,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   label: {
-    fontWeight: '600',
+    fontWeight: 'bold',
     fontSize: 15,
     marginBottom: 6,
     color: '#444',
@@ -122,6 +121,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     lineHeight: 20,
+    // 그림자 속성 추가
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 }, // 아래쪽으로 약간의 그림자
+    shadowOpacity: 0.05, // 투명도를 높여 연하게
+    shadowRadius: 4, // 그림자 블러 효과
+    elevation: 2, // 안드로이드용 그림자 깊이
   },
   errorText: {
     marginTop: 100,
