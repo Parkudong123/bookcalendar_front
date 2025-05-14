@@ -25,9 +25,7 @@ export default function ReviewSummaryScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-        <Text style={styles.backText}>← 목록으로</Text>
-      </TouchableOpacity>
+      {/* 상단 뒤로가기 버튼 삭제됨 */}
 
       <Text style={styles.title}>📚 독서 요약 리포트</Text>
 
@@ -53,12 +51,12 @@ export default function ReviewSummaryScreen() {
         </View>
       )}
 
-       {remainDate !== undefined && remainDate !== null && (
-        <View style={styles.section}>
-          <Text style={styles.label}>남은 날짜</Text>
-          <Text style={styles.value}>{formatRemainDate(remainDate)}</Text>
-        </View>
-      )}
+        {remainDate !== undefined && remainDate !== null && (
+         <View style={styles.section}>
+           <Text style={styles.label}>남은 날짜</Text>
+           <Text style={styles.value}>{formatRemainDate(remainDate)}</Text>
+         </View>
+       )}
 
       <View style={styles.section}>
         <Text style={styles.label}>남은 기간 동안 평균 읽어야 할 분량</Text>
@@ -86,19 +84,11 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 20,
     paddingBottom: 40,
-    paddingTop: 80,
+    paddingTop: 80, // 상단 버튼 삭제로 인해 paddingTop 조정 (원하시면 다른 값으로 변경 가능)
     flexGrow: 1,
   },
-  backBtn: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    zIndex: 10,
-  },
-  backText: {
-    fontSize: 16,
-    color: '#6b4eff',
-  },
+  // backBtn 스타일 규칙 삭제됨
+  // backText 스타일 규칙 삭제됨
   title: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -106,7 +96,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 15,
   },
   label: {
     fontWeight: '600',
@@ -123,7 +113,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   mainButton: {
-    backgroundColor: '#6b4eff',
+    backgroundColor: '#BD9EFF',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',

@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     registerButton: {
-        backgroundColor: '#6b4eff',
+        backgroundColor: '#BD9EFF',
         paddingVertical: 10,
         borderRadius: 8,
         alignItems: 'center',

@@ -1,21 +1,22 @@
+// 수정된 app/_layout.tsx (StatusBar 제거)
+
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar'; // <- StatusBar import 제거
 import { useEffect } from 'react';
-import 'react-native-reanimated'; // Reanimated 필수
+import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-// SplashScreen 자동 숨김 방지
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'), // 예시 폰트, 원하는 경우 변경 가능
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
@@ -30,17 +31,18 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      {/* <Stack> 컴포넌트만 단독으로 렌더링 */}
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="main" />           {/* 메인 (달력 등) */}
-        <Stack.Screen name="(tabs)" />         {/* 하단 탭 라우팅 */}
-        <Stack.Screen name="login" />          {/* 로그인 */}
-        <Stack.Screen name="signup" />         {/* 회원가입 */}
-        <Stack.Screen name="book" />           {/* 도서 정보 조회 */}
-        <Stack.Screen name="bookregister" />   {/* 도서 등록 */}
-        <Stack.Screen name="reviewquestion" /> {/* 질문 응답 페이지 */}
-        <Stack.Screen name="+not-found" />     {/* 404 */}
+        <Stack.Screen name="main" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="signup" />
+        <Stack.Screen name="book" />
+        <Stack.Screen name="bookregister" />
+        <Stack.Screen name="reviewquestion" />
+        <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
+

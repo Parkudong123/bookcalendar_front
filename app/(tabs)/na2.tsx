@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 24,
         flexGrow: 1,
-        paddingTop: 80,
+        paddingTop: 30,
         paddingBottom: 150,
     },
     backButton: {

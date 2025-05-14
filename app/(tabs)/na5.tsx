@@ -87,13 +87,13 @@ export default function MyPageScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingTop: 100,
+    paddingTop: 80,
     paddingBottom: 200,
     backgroundColor: '#fff',
   },
   backBtn: {
     position: 'absolute',
-    top: 60,
+    top: 30,
     left: 20,
     zIndex: 10,
   },

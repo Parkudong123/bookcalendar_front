@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f7fa',
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 30,
   },
   back: {
     marginBottom: 12,

@@ -130,7 +130,7 @@ export default function BookScreen() {
                     <Text style={styles.backText}>← 뒤로가기</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.header}>📚 현재 읽는 도서</Text>
+                <Text style={styles.header}>📚 현재 읽고 있는 도서</Text>
 
                 <View style={styles.fieldBox}>
                     <View style={styles.fieldGroup}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking } from 'react-native'; // Import Linking
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
@@ -15,14 +15,22 @@ export default function CartPage() {
         const res = await axios.get('http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/cart', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setCartItems(res.data.data);
+        // Assuming res.data structure is { "data": [...] }
+        if (res.data && res.data.data) {
+          setCartItems(res.data.data);
+        } else {
+          console.warn('❌ 장바구니 데이터 형식 이상:', res.data);
+          setCartItems([]); // Set empty array if data is not in expected format
+        }
       } catch (err) {
         console.error('❌ 장바구니 조회 실패:', err);
+        // Optionally show an alert to the user
+        Alert.alert('오류', '장바구니 정보를 불러오는데 실패했습니다.');
       }
     };
 
     fetchCart();
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const handleDelete = async (cartId) => {
     Alert.alert('삭제 확인', '해당 도서를 장바구니에서 삭제하시겠습니까?', [
@@ -36,6 +44,7 @@ export default function CartPage() {
             await axios.delete(`http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/cart/${cartId}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
+            // Update state to remove the deleted item
             setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
             Alert.alert('삭제 완료', '도서가 장바구니에서 삭제되었습니다.');
           } catch (err) {
@@ -48,8 +57,30 @@ export default function CartPage() {
     ]);
   };
 
+  // New function to handle item click and open the link
+  const handleItemPress = async (item) => {
+    if (item.link) {
+      try {
+        const supported = await Linking.canOpenURL(item.link);
+
+        if (supported) {
+          await Linking.openURL(item.link);
+        } else {
+          Alert.alert('오류', `이 링크를 열 수 없습니다: ${item.link}`);
+        }
+      } catch (err) {
+        console.error('❌ 링크 열기 실패:', err);
+        Alert.alert('오류', '링크를 여는 중 문제가 발생했습니다.');
+      }
+    } else {
+      Alert.alert('정보', '이 항목에는 연결된 링크가 없습니다.');
+    }
+  };
+
+
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
+    // Use options for better date formatting if needed, but this matches your original format
     return `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`;
   };
 
@@ -62,22 +93,28 @@ export default function CartPage() {
       <Text style={styles.header}>🛒 내 장바구니 목록</Text>
 
       {cartItems.length === 0 ? (
-         <Text style={styles.noDataText}>장바구니가 비어있습니다.</Text>
+          <Text style={styles.noDataText}>장바구니가 비어있습니다.</Text>
       ) : (
         cartItems.map((item) => (
-          <View key={item.cartId} style={styles.card}>
-            <View>
+          // Wrap the item content in TouchableOpacity for click handling
+          <TouchableOpacity
+            key={item.cartId}
+            style={styles.card} // Apply the card style here
+            onPress={() => handleItemPress(item)} // Call the new handler on press
+          >
+            {/* Inner View to hold text content, takes available space */}
+            <View style={{ flex: 1, marginRight: 10 }}>
               <Text style={styles.cardText}>책 제목 : {item.bookName}</Text>
               <Text style={styles.cardText}>저자 : {item.author}</Text>
               <Text style={styles.dateText}>추가한 날짜 : {formatDate(item.date)}</Text>
             </View>
+            {/* Delete button remains a separate TouchableOpacity inside */}
             <TouchableOpacity onPress={() => handleDelete(item.cartId)}>
               <Text style={styles.deleteIcon}>🗑</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         ))
       )}
-
 
       <TouchableOpacity style={styles.addButton} onPress={() => router.push('/cartadd')}>
         <Text style={styles.addButtonText}>도서 추가</Text>
@@ -92,6 +129,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#f4f4f4',
     paddingBottom: 100,
+    flexGrow: 1, // Ensure ScrollView can grow
   },
   backBtn: {
     position: 'absolute',
@@ -105,17 +143,17 @@ const styles = StyleSheet.create({
   },
   header: {
     textAlign: 'center',
-        marginBottom: 16,
-        padding: 8,
-        backgroundColor: '#eee',
-        borderRadius: 8,
-        fontWeight: 'bold',
-        fontSize: 20,
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: '#eee',
+    borderRadius: 8,
+    fontWeight: 'bold',
+    fontSize: 20,
   },
   card: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'row', // Arrange children in a row
+    justifyContent: 'space-between', // Space out items
+    alignItems: 'center', // Vertically center items
     backgroundColor: '#fff',
     padding: 16,
     borderRadius: 10,
@@ -137,8 +175,8 @@ const styles = StyleSheet.create({
   deleteIcon: {
     fontSize: 20,
     color: '#444',
-    padding: 4,
-    marginLeft: 10,
+    padding: 4, // Add padding to make it easier to tap
+    marginLeft: 10, // Space between text and icon
   },
   addButton: {
     backgroundColor: '#e2d9f9',
@@ -151,7 +189,7 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '600',
   },
-   noDataText: {
+  noDataText: {
     textAlign: 'center',
     marginTop: 20,
     color: '#888',

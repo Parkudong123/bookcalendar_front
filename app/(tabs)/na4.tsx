@@ -136,7 +136,7 @@ export default function CommunityScreen() {
              <View style={styles.searchRow}>
                <TextInput
                  style={styles.searchInput}
-                 placeholder="도서 명 검색창"
+                 placeholder="게시물 검색창"
                  placeholderTextColor="#888"
                  value={searchKeyword}
                  onChangeText={(text) => {
@@ -220,7 +220,7 @@ export default function CommunityScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 60,
+        paddingTop: 30,
         paddingHorizontal: 24,
         backgroundColor: '#f8f7fa',
         flex: 1,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     backBtn: {
         fontSize: 16,
         color: '#007AFF',
-        marginBottom: 10,
+        marginBottom: 16,
     },
     header: {
         textAlign: 'center',
