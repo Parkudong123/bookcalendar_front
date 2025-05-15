@@ -295,18 +295,32 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#FFF' },
     scrollContainer: { paddingHorizontal: 16, paddingTop: 50, paddingBottom: 100 },
     banner: {
-        backgroundColor: '#F3EFFF',
-        paddingVertical: 20,
-        paddingHorizontal: 16,
-        borderRadius: 12,
-        marginBottom: 18,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 3,
-        alignItems: 'center',
-    },
-    bannerText: { color: '#333', fontSize: 40, fontWeight: 'bold' },
+    backgroundColor: '#F3EFFF',
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 18,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+    alignItems: 'center', // 이 부분이 배너 내용(bannerContent)을 수직으로 중앙에 배치합니다.
+},
+bannerContent: {
+    flexDirection: 'row', // 로고와 텍스트를 가로로 나열합니다.
+    alignItems: 'center', // 로고와 텍스트를 가로 나열된 상태에서 수직으로 중앙에 맞춥니다.
+},
+logo: {
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
+    marginRight: 8, // 로고 오른쪽에 간격을 줍니다.
+},
+bannerText: {
+    color: '#333',
+    fontSize: 35,
+    fontWeight: 'bold'
+},
     calendar: { borderRadius: 8 },
     bookPeriodContainer: {
         marginTop: 20,
@@ -428,14 +442,5 @@ const styles = StyleSheet.create({
         right: 0,
     },
     icon: { width: 32, height: 32 },
-    bannerContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    logo: {
-        width: 50,
-        height: 50,
-        resizeMode: 'contain',
-        marginRight: 8,
-    },
+    
 });
