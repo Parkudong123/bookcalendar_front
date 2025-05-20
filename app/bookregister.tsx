@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
         top: 16,
         left: 16,
         zIndex: 1,
-        marginTop : 50
+        marginTop : 40
      },
     backButtonText: {
         fontSize: 14,
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: 'bold',
         marginBottom: 20,
-        marginTop: 80,
+        marginTop: 100,
         textAlign: 'center',
         color: '#333',
     },

@@ -121,7 +121,6 @@ export default function MainScreen() {
          }
      };
 
-
     useEffect(() => {
         const currentMonth = new Date().getMonth() + 1;
         fetchHighlightedDates(currentMonth);
@@ -131,18 +130,13 @@ export default function MainScreen() {
 
     useFocusEffect(
         useCallback(() => {
-            // console.log('MainScreen Focused - 데이터 리로드'); // 이 로그를 제거합니다.
             const currentMonth = new Date().getMonth() + 1;
             fetchHighlightedDates(currentMonth);
             fetchMainData();
             fetchBookPeriod(currentMonth);
-
-            return () => {
-                // console.log('MainScreen Blurred'); // 이 로그를 제거합니다.
-            };
+            return () => {};
         }, [])
     );
-
 
     const handleDayPress = (day: any) => {
         const newDateString = day.dateString;
@@ -150,55 +144,37 @@ export default function MainScreen() {
     };
 
     const getIllustrationSource = (progress: number) => {
-        if (progress >= 80) {
-            return require('../image/flower.png');
-        } else if (progress >= 60) {
-            return require('../image/plant.png');
-        } else if (progress >= 40) {
-            return require('../image/sprout.png');
-        } else if (progress >= 20) {
-            return require('../image/seed.png');
-        } else {
-            return require('../image/soil.png');
-        }
+        if (progress >= 80) return require('../image/flower.png');
+        if (progress >= 60) return require('../image/plant.png');
+        if (progress >= 40) return require('../image/sprout.png');
+        if (progress >= 20) return require('../image/seed.png');
+        return require('../image/soil.png');
     };
 
     const formatDate = (dateString: string) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        return `${month}/${day}`;
+        return `${date.getMonth() + 1}/${date.getDate()}`;
     };
 
     const handleFirstTabPress = async () => {
         try {
             const token = await SecureStore.getItemAsync('accessToken');
             if (!token) {
-                console.warn('토큰 없음, 첫 탭 버튼 클릭 시 로그인 페이지로 이동');
                 router.replace('/login');
                 return;
             }
-
             const res = await axios.get('http://ceprj.gachon.ac.kr:60001/api/api/v1/book/info', {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
             const bookData = res.data.data;
-            console.log('📚 첫 탭 버튼 클릭: 도서 정보 조회 응답:', bookData);
-
-            if (bookData && bookData.bookName) {
-                router.push('/book');
-            } else {
-                router.push('/bookregister');
-            }
+            if (bookData && bookData.bookName) router.push('/book');
+            else router.push('/bookregister');
         } catch (e: any) {
-            console.error('❌ 첫 탭 버튼 클릭: 도서 정보 조회 실패 또는 이동 오류:', e.response?.data || e);
             Alert.alert('오류', '도서 정보를 가져오는데 실패했습니다. 등록 페이지로 이동합니다.');
             router.push('/bookregister');
         }
     };
-
 
     return (
         <View style={styles.container}>
@@ -220,10 +196,9 @@ export default function MainScreen() {
                     disableMonthChange={false}
                     firstDay={0}
                     onMonthChange={(month) => {
-                         const newMonth = new Date(month.dateString).getMonth() + 1;
-                         fetchHighlightedDates(newMonth);
-                         fetchBookPeriod(newMonth);
-                         console.log('month changed', month);
+                        const newMonth = new Date(month.dateString).getMonth() + 1;
+                        fetchHighlightedDates(newMonth);
+                        fetchBookPeriod(newMonth);
                     }}
                     theme={{
                         arrowColor: '#6b4eff',
@@ -235,55 +210,51 @@ export default function MainScreen() {
                     }}
                 />
 
-                 <View style={styles.bookPeriodContainer}>
-                     <Text style={styles.bookPeriodTitle}>📚 읽고 있는 책 기간</Text>
-                     {bookPeriods.length === 0 ? (
-                          <Text style={styles.noBookPeriodText}>현재 읽고 있는 책이 없습니다.</Text>
-                     ) : (
-                           <FlatList
-                                 data={bookPeriods}
-                                 keyExtractor={(item: any) => item.BookId.toString()}
-                                 renderItem={({ item }) => (
-                                     <View style={styles.bookPeriodItem}>
-                                         <View style={[styles.colorDot, { backgroundColor: item.color || '#BD9EFE' }]} />
-                                         <View style={{flex: 1}}>
-                                            <Text style={styles.bookNameText} numberOfLines={1} ellipsizeMode="tail">{item.BookName}</Text>
-                                            <Text style={styles.bookDateRangeText}>{`${formatDate(item.startDate)} ~ ${formatDate(item.finishDate)}`}</Text>
-                                         </View>
-                                     </View>
-                                 )}
-                                 contentContainerStyle={styles.bookPeriodListContent}
-                                 scrollEnabled={false}
-                            />
-                      )}
-                  </View>
+                <View style={styles.bookPeriodContainer}>
+                    <Text style={styles.bookPeriodTitle}>📚 읽고 있는 책 기간</Text>
+                    {bookPeriods.length === 0 ? (
+                        <Text style={styles.noBookPeriodText}>현재 읽고 있는 책이 없습니다.</Text>
+                    ) : (
+                        <FlatList
+                            data={bookPeriods}
+                            keyExtractor={(item: any) => item.BookId.toString()}
+                            renderItem={({ item }) => (
+                                <View style={styles.bookPeriodItem}>
+                                    <View style={[styles.colorDot, { backgroundColor: item.color || '#BD9EFE' }]} />
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={styles.bookNameText} numberOfLines={1} ellipsizeMode="tail">{item.BookName}</Text>
+                                        <Text style={styles.bookDateRangeText}>{`${formatDate(item.startDate)} ~ ${formatDate(item.finishDate)}`}</Text>
+                                    </View>
+                                </View>
+                            )}
+                            contentContainerStyle={styles.bookPeriodListContent}
+                            scrollEnabled={false}
+                        />
+                    )}
+                </View>
 
                 <View style={styles.progressBox}>
                     <Text style={styles.progressTitle}>📈 독서 진행률</Text>
                     <Text style={styles.progressPercent}>{Math.round(progress)}%</Text>
                     <Text style={styles.dueText}>📅 마감까지 남은 일수 : D-{dDay !== null ? dDay : '-'}</Text>
-
-                    <Image
-                        source={getIllustrationSource(progress)}
-                        style={styles.illustrationStyle}
-                    />
+                    <Image source={getIllustrationSource(progress)} style={styles.illustrationStyle} />
                 </View>
             </ScrollView>
 
             <View style={styles.fakeTabBar}>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/na1')}>
+                <TouchableOpacity onPress={() => router.push('/na1')}>
                     <Image source={require('@/image/icon_bookregister.png')} style={styles.icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/na2')}>
+                <TouchableOpacity onPress={() => router.push('/na2')}>
                     <Image source={require('@/image/icon_bookreport.png')} style={styles.icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/na3')}>
+                <TouchableOpacity onPress={() => router.push('/na3')}>
                     <Image source={require('@/image/icon_aichat.png')} style={styles.icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/na4')}>
+                <TouchableOpacity onPress={() => router.push('/na4')}>
                     <Image source={require('@/image/community6.png')} style={styles.icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/na5')}>
+                <TouchableOpacity onPress={() => router.push('/na5')}>
                     <Image source={require('@/image/icon_community.png')} style={styles.icon} />
                 </TouchableOpacity>
             </View>
@@ -295,54 +266,33 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#FFF' },
     scrollContainer: { paddingHorizontal: 16, paddingTop: 50, paddingBottom: 100 },
     banner: {
-    backgroundColor: '#F3EFFF',
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginBottom: 18,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-    alignItems: 'center', // 이 부분이 배너 내용(bannerContent)을 수직으로 중앙에 배치합니다.
-},
-bannerContent: {
-    flexDirection: 'row', // 로고와 텍스트를 가로로 나열합니다.
-    alignItems: 'center', // 로고와 텍스트를 가로 나열된 상태에서 수직으로 중앙에 맞춥니다.
-},
-logo: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
-    marginRight: 8, // 로고 오른쪽에 간격을 줍니다.
-},
-bannerText: {
-    color: '#333',
-    fontSize: 35,
-    fontWeight: 'bold'
-},
+        backgroundColor: '#F3EFFF',
+        paddingVertical: 20,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        marginBottom: 18,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 3,
+        alignItems: 'center',
+    },
+    bannerContent: { flexDirection: 'row', alignItems: 'center' },
+    logo: { width: 50, height: 50, resizeMode: 'contain', marginRight: 8 },
+    bannerText: { color: '#333', fontSize: 35, fontWeight: 'bold' },
     calendar: { borderRadius: 8 },
     bookPeriodContainer: {
         marginTop: 20,
         padding: 16,
-        backgroundColor:'#F3EFFF',
+        backgroundColor: '#F3EFFF',
         borderRadius: 10,
         shadowColor: '#000',
         shadowOpacity: 0.05,
         shadowRadius: 4,
         elevation: 3,
     },
-    bookPeriodTitle: {
-        fontWeight: 'bold',
-        fontSize: 14,
-        marginBottom: 12,
-        textAlign: 'center',
-        color: '#333',
-    },
-    bookPeriodListContent: {
-        paddingHorizontal: 0,
-        paddingBottom: 0,
-       },
+    bookPeriodTitle: { fontWeight: 'bold', fontSize: 14, marginBottom: 12, textAlign: 'center', color: '#333' },
+    bookPeriodListContent: { paddingHorizontal: 0, paddingBottom: 0 },
     bookPeriodItem: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -354,12 +304,7 @@ bannerText: {
         borderColor: '#eee',
         marginHorizontal: 0,
     },
-    colorDot: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        marginRight: 10,
-    },
+    colorDot: { width: 12, height: 12, borderRadius: 6, marginRight: 10 },
     bookPeriodItemBoxTwoColumn: {
         flex: 1,
         marginHorizontal: 8,
@@ -369,26 +314,11 @@ bannerText: {
         borderRadius: 8,
         borderWidth: 1,
         borderColor: '#eee',
-         alignItems: 'center',
-       },
-    bookNameText: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#333',
-        textAlign: 'left',
+        alignItems: 'center',
     },
-    bookDateRangeText: {
-        fontSize: 13,
-        color: '#666',
-        marginTop: 4,
-        textAlign: 'left',
-    },
-     noBookPeriodText: {
-         fontSize: 13,
-         color: '#888',
-         textAlign: 'center',
-         fontStyle: 'italic',
-       },
+    bookNameText: { fontSize: 14, fontWeight: 'bold', color: '#333', textAlign: 'left' },
+    bookDateRangeText: { fontSize: 13, color: '#666', marginTop: 4, textAlign: 'left' },
+    noBookPeriodText: { fontSize: 13, color: '#888', textAlign: 'center', fontStyle: 'italic' },
     progressBox: {
         marginTop: 20,
         paddingTop: 16,
@@ -402,31 +332,10 @@ bannerText: {
         elevation: 3,
         alignItems: 'center',
     },
-    progressTitle: {
-        fontWeight: 'bold',
-        fontSize: 14,
-        marginBottom: 8,
-        textAlign: 'center',
-    },
-    progressPercent: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#6b4eff',
-        textAlign: 'center',
-    },
-    dueText: {
-        marginTop: 8,
-        fontSize: 13,
-        color: '#666',
-        marginBottom: 16,
-        textAlign: 'center',
-    },
-    illustrationStyle: {
-        width: '80%',
-        height: 150,
-        resizeMode: 'contain',
-        marginTop: 8,
-    },
+    progressTitle: { fontWeight: 'bold', fontSize: 14, marginBottom: 8, textAlign: 'center' },
+    progressPercent: { fontSize: 24, fontWeight: 'bold', color: '#6b4eff', textAlign: 'center' },
+    dueText: { marginTop: 8, fontSize: 13, color: '#666', marginBottom: 16, textAlign: 'center' },
+    illustrationStyle: { width: '80%', height: 150, resizeMode: 'contain', marginTop: 8 },
     fakeTabBar: {
         flexDirection: 'row',
         justifyContent: 'space-around',
@@ -442,5 +351,4 @@ bannerText: {
         right: 0,
     },
     icon: { width: 32, height: 32 },
-    
 });
