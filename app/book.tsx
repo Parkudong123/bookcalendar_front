@@ -1,4 +1,3 @@
-// book.tsx
 import React, { useEffect, useState } from 'react';
 import {
     View,
@@ -16,7 +15,7 @@ import axios from 'axios';
 
 export default function BookScreen() {
     const router = useRouter();
-    const [book, setBook] = useState<any>(null); // book 타입을 명확히 지정하는 것이 좋습니다 (예: Book | null)
+    const [book, setBook] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isCompleting, setIsCompleting] = useState(false);
 
@@ -54,7 +53,7 @@ export default function BookScreen() {
                 onPress: async () => {
                     try {
                         const token = await SecureStore.getItemAsync('accessToken');
-                        if (!token) { // 토큰 검증 추가
+                        if (!token) {
                             Alert.alert('로그인 필요', '서비스 이용을 위해 로그인이 필요합니다.');
                             router.replace('/login');
                             return;
@@ -90,34 +89,31 @@ export default function BookScreen() {
 
                     try {
                         const token = await SecureStore.getItemAsync('accessToken');
-                        if (!token) { // 토큰 검증 추가
+                        if (!token) {
                             Alert.alert('로그인 필요', '서비스 이용을 위해 로그인이 필요합니다.');
                             router.replace('/login');
-                            setIsCompleting(false); // 로딩 해제
+                            setIsCompleting(false);
                             return;
                         }
 
-                        // 여기에서만 POST /api/v1/book/complete API 호출
                         const res = await axios.post(
                             'http://ceprj.gachon.ac.kr:60001/api/api/v1/book/complete',
-                            {}, // 요청 본문이 필요하다면 여기에 추가
+                            {},
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
 
-                        // API 응답에서 받은 추천 도서 데이터를 'bookrecommend2'로 전달
-                        // 받은 데이터가 res.data.data 배열 형태인지 확인 (API 명세에 따름)
                         const recommendedBooks = res.data.data || [];
 
                         router.push({
                             pathname: '/bookrecommend2',
-                            params: { recommendedBooks: JSON.stringify(recommendedBooks) }, // 파라미터 이름을 더 명확하게 변경
+                            params: { recommendedBooks: JSON.stringify(recommendedBooks) },
                         });
 
                     } catch (error: any) {
                         console.error('❌ 독서 완료 처리 실패:', error.response?.data || error);
                         const errorMessage = error.response?.data?.message || '도서 완료 처리 중 문제가 발생했습니다.';
                         Alert.alert('오류', errorMessage);
-                        setIsCompleting(false); // 오류 발생 시 로딩 해제
+                        setIsCompleting(false);
                     }
                 }
             }
