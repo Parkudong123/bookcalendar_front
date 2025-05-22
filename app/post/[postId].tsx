@@ -215,7 +215,7 @@ export default function PostDetailScreen() {
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
                         Alert.alert('삭제 완료', '게시글이 삭제되었습니다.');
-                        router.replace('/(tabs)/na4');
+                        router.replace('/na4');
                     } catch (error: any) {
                         const errorMessage = error.response?.data?.message || '삭제 권한이 없거나 오류가 발생했습니다.';
                         Alert.alert('삭제 실패', errorMessage);
@@ -448,8 +448,8 @@ const styles = StyleSheet.create({
         marginLeft: 1,
         marginRight: 4,
     },
-    contentBox: { backgroundColor: '#f5f5f5', borderRadius: 10, padding: 16, marginBottom: 24 },
-    contents: { fontSize: 15, color: '#333' },
+    contentBox: { backgroundColor: '#f5f5f5', borderRadius: 10, padding: 16, marginBottom: 24,minHeight: 100 },
+    contents: { fontSize: 15, color: '#333', lineHeight : 22 },
     commentTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 12 },
     noComment: { fontSize: 14, color: '#999' },
     commentItem: { backgroundColor: '#f0f0f0', padding: 12, borderRadius: 8, marginBottom: 12 },

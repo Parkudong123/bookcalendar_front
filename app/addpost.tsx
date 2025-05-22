@@ -48,7 +48,7 @@ export default function AddPost() {
       );
 
       Alert.alert('게시물 등록 완료');
-      router.push('/(tabs)/na4');
+      router.push('/na4');
     } catch (error) {
       console.error('❌ 게시물 등록 실패:', error.response?.data || error);
       const errorMessage = error.response?.data?.message || '게시물 등록 중 오류가 발생했습니다.';
@@ -65,7 +65,7 @@ export default function AddPost() {
         style={styles.keyboardAvoidingView}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
-        <TouchableOpacity onPress={() => router.push('/(tabs)/na4')} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => router.push('/na4')} style={styles.backBtn}>
           <Text style={styles.backText}>← 뒤로가기</Text>
         </TouchableOpacity>
 

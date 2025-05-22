@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // useEffect와 useRef 임포트 추가
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator, // ActivityIndicator를 임포트합니다.
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
@@ -17,8 +18,8 @@ export default function AIChatScreen() {
   const router = useRouter();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
 
-  // ScrollView 인스턴스에 접근하기 위한 ref 생성
   const scrollViewRef = useRef(null);
 
   const handleSend = async () => {
@@ -27,6 +28,7 @@ export default function AIChatScreen() {
     const newMessage = { sender: 'user', text: input };
     setMessages(prev => [...prev, newMessage]);
     setInput('');
+    setIsLoading(true); // 메시지 전송 시 로딩 시작
 
     try {
       const token = await SecureStore.getItemAsync('accessToken');
@@ -45,21 +47,20 @@ export default function AIChatScreen() {
     } catch (error) {
       console.error('❌ AI 응답 실패:', error.response?.data || error);
       setMessages(prev => [...prev, { sender: 'ai', text: 'AI 응답을 가져오는데 실패했습니다.' }]);
+    } finally {
+      setIsLoading(false); // 응답 (성공 또는 실패) 후 로딩 종료
     }
-    // 메시지가 추가되면 useEffect가 호출되어 스크롤됩니다.
   };
 
   const handleRecommend = () => {
-     router.push('/bookrecommend');
+    router.push('/bookrecommend');
   };
 
-  // messages 상태가 변경될 때마다 스크롤 최하단으로 이동
   useEffect(() => {
-    // scrollViewRef.current가 존재하는지 확인 (컴포넌트 마운트 후)
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true }); // animated: true로 부드럽게 스크롤
+      scrollViewRef.current.scrollToEnd({ animated: true });
     }
-  }, [messages]); // messages 배열을 의존성 배열로 설정
+  }, [messages, isLoading]); // messages와 isLoading이 변경될 때마다 스크롤
 
   return (
     <View style={styles.container}>
@@ -75,7 +76,6 @@ export default function AIChatScreen() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       >
         <View style={styles.chatBox}>
-          {/* ScrollView에 ref 연결 */}
           <ScrollView ref={scrollViewRef} contentContainerStyle={styles.chatContainer}>
             {messages.map((msg, idx) => (
               <View
@@ -88,6 +88,16 @@ export default function AIChatScreen() {
                 <Text style={styles.msgText}>{msg.text}</Text>
               </View>
             ))}
+
+            {/* 로딩 표시기 버블 */}
+            {isLoading && (
+              <View style={[styles.bubble, styles.aiBubble, styles.loadingBubble]}>
+                {/* 옵션 1: 간단한 "..." 텍스트 */}
+                <Text style={styles.msgText}>. . .</Text>
+                {/* 옵션 2: ActivityIndicator (임포트 필요) */}
+                {/* <ActivityIndicator size="small" color="#333" /> */}
+              </View>
+            )}
           </ScrollView>
         </View>
 
@@ -100,8 +110,9 @@ export default function AIChatScreen() {
             placeholderTextColor="#aaa"
             onSubmitEditing={handleSend}
             blurOnSubmit={false}
+            editable={!isLoading} // 로딩 중일 때 입력 비활성화
           />
-          <TouchableOpacity style={styles.sendBtn} onPress={handleSend}>
+          <TouchableOpacity style={styles.sendBtn} onPress={handleSend} disabled={isLoading}>
             <Text style={styles.sendText}>전송</Text>
           </TouchableOpacity>
         </View>
@@ -145,7 +156,6 @@ const styles = StyleSheet.create({
   chatContainer: {
     padding: 10,
     flexGrow: 1,
-    // justifyContent: 'flex-end', // 이 라인은 이전 수정에서 이미 제거되었습니다.
   },
   bubble: {
     borderRadius: 12,
@@ -164,6 +174,9 @@ const styles = StyleSheet.create({
   msgText: {
     fontSize: 14,
     color: '#333',
+  },
+  loadingBubble: {
+    opacity: 0.7, // 로딩 버블을 약간 투명하게 만듭니다.
   },
   inputRow: {
     flexDirection: 'row',

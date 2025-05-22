@@ -82,7 +82,7 @@ export default function BookReviewScreen() {
                 }
             );
 
-             Alert.alert('제출 성공', '독후감이 기록되었습니다.');
+
 
             router.push({
                 pathname: '/reviewquestion',
