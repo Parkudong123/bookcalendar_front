@@ -73,10 +73,10 @@ export default function UserInfoPatchScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-        <Text style={styles.backText}>← 프로필 페이지</Text>
+        <Text style={styles.backBtn}>← 프로필 페이지</Text>
       </TouchableOpacity>
 
-      <Image source={require('..//image/logo.png')} style={styles.avatar} />
+      <Image source={require('..//image/people2.png')} style={styles.avatar} />
 
       <View style={styles.fieldBox}>
         <View style={styles.fieldGroup}>
@@ -135,19 +135,13 @@ export default function UserInfoPatchScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingTop: 100,
+    paddingTop: 40,
     paddingBottom: 60,
     backgroundColor: '#f4f4f4',
   },
-  backBtn: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    zIndex: 10,
-  },
-  backText: {
-    fontSize: 16,
-    color: '#6b4eff',
+   backBtn: {
+    marginBottom: 18,
+    alignSelf: 'flex-start',
   },
   avatar: {
     width: 100,

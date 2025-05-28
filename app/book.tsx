@@ -143,7 +143,7 @@ export default function BookScreen() {
         <View style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={styles.container}>
                 <TouchableOpacity onPress={() => router.push('/main')} style={styles.backBtn}>
-                    <Text style={styles.backText}>← 뒤로가기</Text>
+                    <Text style={styles.backBtn}>← 뒤로가기</Text>
                 </TouchableOpacity>
 
                 <Text style={styles.header}>📚 현재 읽고 있는 도서</Text>
@@ -210,7 +210,7 @@ export default function BookScreen() {
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
-        paddingTop: 100,
+        paddingTop: 30,
         paddingBottom: 60,
         backgroundColor: '#f4f4f4',
         flexGrow: 1,
@@ -222,15 +222,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#f4f4f4',
     },
     backBtn: {
-        position: 'absolute',
-        top: 50,
-        left: 20,
-        zIndex: 10,
+        marginBottom: 18,
+    alignSelf: 'flex-start',
     },
-    backText: {
-        fontSize: 16,
-        color: '#6b4eff',
-    },
+    
     header: {
         fontSize: 22,
         fontWeight: 'bold',

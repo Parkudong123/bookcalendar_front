@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     rightButtons: { flexDirection: 'row', alignItems: 'center' },
     headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
     headerIcons: { flexDirection: 'row', alignItems: 'center' },
-    backText: { fontSize: 16, color: '#6b4eff' },
+    backText: {marginBottom: 20,alignSelf: 'flex-start',},
     reportBtnWrap: { backgroundColor: '#ffecec', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5, marginRight: 4 },
     reportBtn: { color: '#ff3b30', fontWeight: 'bold', fontSize: 13 },
     deleteBtn: { backgroundColor: '#ff4d4d', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },

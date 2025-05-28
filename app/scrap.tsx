@@ -63,7 +63,7 @@ export default function ScrapPage() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={() => router.back()}>
-        <Text style={styles.backText}>← 마이 페이지</Text>
+        <Text style={styles.backText}>← 뒤로가기</Text>
       </TouchableOpacity>
 
       <Text style={styles.header}>⭐ 스크랩 페이지</Text>
@@ -91,17 +91,16 @@ export default function ScrapPage() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 30,
     backgroundColor: '#f4f4f4',
   },
   backText: {
-    fontSize: 16,
-    color: '#6b4eff',
-    marginBottom: 16,
+    marginBottom: 18,
+    alignSelf: 'flex-start',
   },
   header: {
     textAlign: 'center',
-        marginBottom: 16,
+        marginBottom: 20,
         padding: 8,
         backgroundColor: '#eee',
         borderRadius: 8,

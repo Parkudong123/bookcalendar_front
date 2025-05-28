@@ -86,7 +86,7 @@ export default function ChallengeScreen() {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <TouchableOpacity onPress={() => router.push('/na5')} style={styles.backBtn}>
-                <Text style={styles.backText}>← 마이 페이지</Text>
+                <Text style={styles.backBtn}>← 뒤로가기</Text>
             </TouchableOpacity>
 
             <Text style={styles.header}>🏆 독후감 작성 Challenge</Text>
@@ -167,23 +167,18 @@ export default function ChallengeScreen() {
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
-        paddingTop: 100,
+        paddingTop: 30,
         paddingBottom: 60,
         backgroundColor: '#f8f8f8',
     },
-    backBtn: {
-        position: 'absolute',
-        top: 50,
-        left: 20,
-        zIndex: 10,
+     backBtn: {
+    marginBottom: 18,
+    alignSelf: 'flex-start',
     },
-    backText: {
-        fontSize: 16,
-        color: '#6b4eff',
-    },
+    
     header: {
         textAlign: 'center',
-        marginBottom: 16,
+        marginBottom: 12,
         padding: 8,
         backgroundColor: '#eee',
         borderRadius: 8,
@@ -200,7 +195,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 20,
         borderRadius: 12,
-        marginBottom: 24,
+        marginBottom: 16,
         alignItems: 'center',
     },
     medalIcon: {

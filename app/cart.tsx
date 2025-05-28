@@ -87,7 +87,7 @@ export default function CartPage() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity style={styles.backBtn} onPress={() => router.push('/na5')}>
-        <Text style={styles.backText}>← 마이 페이지</Text>
+        <Text style={styles.backText}>← 뒤로가기</Text>
       </TouchableOpacity>
 
       <Text style={styles.header}>🛒 내 장바구니 목록</Text>
@@ -125,22 +125,17 @@ export default function CartPage() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 80,
+    paddingTop: 30,
     paddingHorizontal: 20,
     backgroundColor: '#f4f4f4',
     paddingBottom: 100,
     flexGrow: 1, // Ensure ScrollView can grow
   },
-  backBtn: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    zIndex: 10,
+   backBtn: {
+    marginBottom: 18,
+    alignSelf: 'flex-start',
   },
-  backText: {
-    fontSize: 14,
-    color: '#6b4eff',
-  },
+  
   header: {
     textAlign: 'center',
     marginBottom: 16,

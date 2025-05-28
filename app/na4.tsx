@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -12,9 +12,7 @@ import {
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
-
+import { useFocusEffect } from '@react-navigation/native'; // 초기 로드/일반 포커스를 위해 유지
 
 export default function CommunityScreen() {
     const router = useRouter();
@@ -25,6 +23,15 @@ export default function CommunityScreen() {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [searching, setSearching] = useState(false);
 
+    // 데이터를 모두 불러오는 함수를 하나로 묶습니다.
+    const fetchData = async () => {
+        setLoading(true);
+        await Promise.all([
+            fetchAllPosts(),
+            fetchTopLikedPosts(),
+        ]);
+        setLoading(false);
+    };
 
     const fetchAllPosts = async () => {
         try {
@@ -35,10 +42,7 @@ export default function CommunityScreen() {
                 },
             });
             if (res.data?.data) {
-                // date 필드를 기준으로 내림차순(최신순) 정렬
                 const sortedPosts = res.data.data.sort((a, b) => {
-                    // date가 string 형태라고 가정하고 Date 객체로 변환하여 비교합니다.
-                    // 만약 date가 이미 timestamp라면 바로 뺄셈 연산 가능합니다.
                     return new Date(b.date).getTime() - new Date(a.date).getTime();
                 });
                 setAllPosts(sortedPosts);
@@ -71,31 +75,19 @@ export default function CommunityScreen() {
         }
     };
 
-
+    // useFocusEffect는 화면이 포커싱될 때마다 fetchData를 호출합니다.
     useFocusEffect(
       useCallback(() => {
-        const loadData = async () => {
-            setLoading(true);
-            await Promise.all([
-                fetchAllPosts(),
-                fetchTopLikedPosts(),
-            ]);
-            setLoading(false);
-        };
-
-        loadData();
-
-        return () => {
-        };
-      }, [])
+        fetchData(); // 화면이 다시 포커싱될 때 데이터를 새로 불러옵니다.
+        return () => {}; // 필요시 정리 함수
+      }, []) // 빈 의존성 배열로 컴포넌트 마운트 시, 언마운트 시, 그리고 포커싱 시에만 실행
     );
-
 
     const handleSearch = async () => {
         if (!searchKeyword.trim()) {
             setSearchKeyword('');
             setSearchResults([]);
-            fetchAllPosts();
+            fetchAllPosts(); // 검색어를 지우면 전체 게시물 새로고침
             return;
         }
 
@@ -125,10 +117,8 @@ export default function CommunityScreen() {
         }
     };
 
-
     const postsToDisplay = searchKeyword.trim() ? searchResults : allPosts;
     const mainListHeading = searchKeyword.trim() ? '🔍 검색 결과' : '📄 전체 게시물';
-
 
     return (
         <View style={styles.container}>
@@ -148,11 +138,12 @@ export default function CommunityScreen() {
                      setSearchKeyword(text);
                      if (!text.trim()) {
                          setSearchResults([]);
+                         // 필요하다면 여기서 fetchData()를 호출하여 검색어가 지워질 때 즉시 전체 목록을 새로고침할 수 있습니다.
                      }
                  }}
                />
                <TouchableOpacity onPress={handleSearch} disabled={searching}>
-                 {searching ? <ActivityIndicator size="small" color="#007AFF" /> : <Text style={styles.closeBtn}>검색</Text>}
+                  {searching ? <ActivityIndicator size="small" color="#007AFF" /> : <Text style={styles.closeBtn}>검색</Text>}
                </TouchableOpacity>
             </View>
 
@@ -160,62 +151,62 @@ export default function CommunityScreen() {
 
             {!loading && (
                <ScrollView style={styles.postList}>
-                 <Text style={styles.sectionHeader}>🌟 인기 게시글</Text>
-                 {topLikedPosts.length === 0 ? (
-                    <Text style={{ textAlign: 'center', color: '#999', marginBottom: 20 }}>인기 게시글이 없습니다.</Text>
-                 ) : (
-                    topLikedPosts.map((item) => (
-                      <TouchableOpacity
-                        key={`top-${item.postId}`}
-                        onPress={() => router.push(`/post/${item.postId}`)}
-                      >
-                        <View style={styles.popularPostBox}>
-                          <Text style={styles.postTitle}>{item.title}</Text>
-                          <View style={styles.metaAndLikeRow}>
-                            <View>
+                  <Text style={styles.sectionHeader}>🌟 인기 게시글</Text>
+                  {topLikedPosts.length === 0 ? (
+                      <Text style={{ textAlign: 'center', color: '#999', marginBottom: 20 }}>인기 게시글이 없습니다.</Text>
+                  ) : (
+                      topLikedPosts.map((item) => (
+                          <TouchableOpacity
+                            key={`top-${item.postId}`}
+                            onPress={() => router.push(`/post/${item.postId}`)}
+                          >
+                            <View style={styles.popularPostBox}>
+                              <Text style={styles.postTitle}>{item.title}</Text>
+                              <View style={styles.metaAndLikeRow}>
+                                <View>
+                                  <Text style={styles.postMeta}>작성자: {item.author}</Text>
+                                  {item.date && <Text style={styles.postMeta}>작성일시: {new Date(item.date).toLocaleString()}</Text>}
+                                </View>
+                                {typeof item.likeCount === 'number' && (
+                                    <Text style={styles.postLikeCountCompact}>❤️ {item.likeCount}</Text>
+                                )}
+                              </View>
+                            </View>
+                          </TouchableOpacity>
+                      ))
+                  )}
+
+                  <Text style={styles.sectionHeader}>{mainListHeading}</Text>
+                  {searching ? (
+                      <ActivityIndicator size="large" color="#333" style={{ marginTop: 20 }} />
+                  ) : postsToDisplay.length === 0 ? (
+                      <Text style={{ textAlign: 'center', color: '#999' }}>
+                          {searchKeyword.trim() ? '검색 결과가 없습니다.' : '게시물이 없습니다.'}
+                      </Text>
+                  ) : (
+                      postsToDisplay.map((item) => (
+                          <TouchableOpacity
+                            key={`all-${item.postId}`}
+                            onPress={() => router.push(`/post/${item.postId}`)}
+                          >
+                            <View style={styles.postBox}>
+                              <Text style={styles.postTitle}>{item.title}</Text>
                               <Text style={styles.postMeta}>작성자: {item.author}</Text>
                               {item.date && <Text style={styles.postMeta}>작성일시: {new Date(item.date).toLocaleString()}</Text>}
+                               {item.hasOwnProperty('likeCount') && typeof item.likeCount === 'number' && (
+                                   <Text style={styles.postLikeCount}>❤️ {item.likeCount}</Text>
+                               )}
                             </View>
-                            {typeof item.likeCount === 'number' && (
-                                <Text style={styles.postLikeCountCompact}>❤️ {item.likeCount}</Text>
-                            )}
-                          </View>
-                        </View>
-                      </TouchableOpacity>
-                    ))
-                 )}
-
-                 <Text style={styles.sectionHeader}>{mainListHeading}</Text>
-                 {searching ? (
-                     <ActivityIndicator size="large" color="#333" style={{ marginTop: 20 }} />
-                 ) : postsToDisplay.length === 0 ? (
-                    <Text style={{ textAlign: 'center', color: '#999' }}>
-                        {searchKeyword.trim() ? '검색 결과가 없습니다.' : '게시물이 없습니다.'}
-                    </Text>
-                 ) : (
-                    postsToDisplay.map((item) => (
-                      <TouchableOpacity
-                        key={`all-${item.postId}`}
-                        onPress={() => router.push(`/post/${item.postId}`)}
-                      >
-                        <View style={styles.postBox}>
-                          <Text style={styles.postTitle}>{item.title}</Text>
-                          <Text style={styles.postMeta}>작성자: {item.author}</Text>
-                          {item.date && <Text style={styles.postMeta}>작성일시: {new Date(item.date).toLocaleString()}</Text>}
-                           {item.hasOwnProperty('likeCount') && typeof item.likeCount === 'number' && (
-                               <Text style={styles.postLikeCount}>❤️ {item.likeCount}</Text>
-                            )}
-                        </View>
-                      </TouchableOpacity>
-                    ))
-                 )}
+                          </TouchableOpacity>
+                      ))
+                  )}
                </ScrollView>
             )}
 
-
             <TouchableOpacity
                style={styles.addBtn}
-               onPress={() => router.push('/addpost')}
+               // addpost 경로로 이동할 때 onPostAdded 파라미터를 true로 전달합니다.
+               onPress={() => router.push({ pathname: '/addpost', params: { onPostAdded: true } })}
             >
                <Text style={styles.addBtnText}>게시물 추가 버튼</Text>
             </TouchableOpacity>
@@ -231,9 +222,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     backBtn: {
-        fontSize: 16,
-        color: '#007AFF',
-        marginBottom: 16,
+        marginBottom: 20,
+    alignSelf: 'flex-start',
     },
     header: {
         textAlign: 'center',

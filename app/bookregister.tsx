@@ -71,7 +71,7 @@ export default function BookRegisterScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <TouchableOpacity onPress={() => router.push('/main')} style={styles.backButton}>
-                <Text style={styles.backButtonText}>← 뒤로가기</Text>
+                <Text style={styles.backBtn}>← 뒤로가기</Text>
             </TouchableOpacity>
 
             <Text style={styles.header}>도서 등록 페이지</Text>
@@ -162,30 +162,25 @@ export default function BookRegisterScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#f8f7fa',
-    },
+    paddingHorizontal: 20,
+    paddingTop: 30,
+    paddingBottom: 40,
+    backgroundColor: '#f4f4f4',
+  },
+  backBtn: {
+    marginBottom: 18,
+    alignSelf: 'flex-start',
+  },
     scrollContent: {
         flexGrow: 1, // ScrollView 내용이 컨테이너를 채우도록 설정
         paddingHorizontal: 20, // ScrollView 좌우 패딩
         paddingBottom: 40, // ScrollView 하단 패딩
     },
-     backButton: {
-        position: 'absolute',
-        top: 16,
-        left: 16,
-        zIndex: 1,
-        marginTop : 40
-     },
-    backButtonText: {
-        fontSize: 14,
-        color: '#666',
-    },
     header: {
         fontSize: 22,
         fontWeight: 'bold',
         marginBottom: 20,
-        marginTop: 100,
+        marginTop: 25,
         textAlign: 'center',
         color: '#333',
     },

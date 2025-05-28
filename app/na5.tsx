@@ -48,7 +48,7 @@ export default function MyPageScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={() => router.push('/main')} style={styles.backBtn}>
-        <Text style={styles.backText}>← 메인으로</Text>
+        <Text style={styles.backBtn}>← 뒤로가기</Text>
       </TouchableOpacity>
 
       <Text style={styles.header}>마이 페이지</Text>
@@ -87,19 +87,13 @@ export default function MyPageScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingTop: 80,
+    paddingTop: 30,
     paddingBottom: 200,
-    backgroundColor: '#fff',
+    backgroundColor: '#f4f4f4',
   },
   backBtn: {
-    position: 'absolute',
-    top: 30,
-    left: 20,
-    zIndex: 10,
-  },
-  backText: {
-    fontSize: 16,
-    color: '#6b4eff',
+    marginBottom: 18,
+    alignSelf: 'flex-start',
   },
   header: {
     fontSize: 18,
@@ -110,7 +104,7 @@ const styles = StyleSheet.create({
   profileBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
     marginBottom: 30,

@@ -46,7 +46,7 @@ export default function UserDetailScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-        <Text style={styles.backText}>← 마이 페이지</Text>
+        <Text style={styles.backBtn}>← 뒤로가기</Text>
       </TouchableOpacity>
 
       <Image source={require('..//image/people2.png')} style={styles.avatar} />
@@ -91,20 +91,15 @@ export default function UserDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    paddingTop: 100,
+    paddingTop: 30,
     paddingBottom: 60,
     backgroundColor: '#f4f4f4',
   },
-  backBtn: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    zIndex: 10,
+   backBtn: {
+    marginBottom: 18,
+    alignSelf: 'flex-start',
   },
-  backText: {
-    fontSize: 16,
-    color: '#6b4eff',
-  },
+  
   avatar: {
     width: 100,
     height: 100,

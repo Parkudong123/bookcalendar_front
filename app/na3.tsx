@@ -68,7 +68,7 @@ export default function AIChatScreen() {
         <Text style={{ color: '#666' }}>← 뒤로가기</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title}>🤖 AI 사서의 도서 추천</Text>
+      <Text style={styles.title}>👩‍🏫 AI 사서의 도서 추천</Text>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -92,10 +92,9 @@ export default function AIChatScreen() {
             {/* 로딩 표시기 버블 */}
             {isLoading && (
               <View style={[styles.bubble, styles.aiBubble, styles.loadingBubble]}>
-                {/* 옵션 1: 간단한 "..." 텍스트 */}
+                
                 <Text style={styles.msgText}>. . .</Text>
-                {/* 옵션 2: ActivityIndicator (임포트 필요) */}
-                {/* <ActivityIndicator size="small" color="#333" /> */}
+                
               </View>
             )}
           </ScrollView>
@@ -134,6 +133,7 @@ const styles = StyleSheet.create({
   },
   back: {
     marginBottom: 12,
+    alignSelf: 'flex-start',
   },
   title: {
     fontSize: 18,

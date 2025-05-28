@@ -236,7 +236,7 @@ export default function MainScreen() {
                 <View style={styles.progressBox}>
                     <Text style={styles.progressTitle}>📈 독서 진행률</Text>
                     <Text style={styles.progressPercent}>{Math.round(progress)}%</Text>
-                    <Text style={styles.dueText}>📅 마감까지 남은 일수 : D-{dDay !== null ? dDay : '-'}</Text>
+                    <Text style={styles.dueText}>📅 마감까지 남은 일수 : D{dDay !== null ? dDay : '-'}</Text>
                     <Image source={getIllustrationSource(progress)} style={styles.illustrationStyle} />
                 </View>
             </ScrollView>

@@ -57,7 +57,7 @@ export default function ReportListScreen() {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                <Text style={styles.backText}>← 마이 페이지</Text>
+                <Text style={styles.backText}>← 뒤로가기</Text>
             </TouchableOpacity>
 
             <View style={styles.headerBox}>
@@ -93,20 +93,15 @@ export default function ReportListScreen() {
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 20,
-        paddingTop: 100,
+        paddingTop: 30,
         paddingBottom: 500,
         backgroundColor: '#f4f4f4',
     },
-    backBtn: {
-        position: 'absolute',
-        top: 60,
-        left: 20,
-        zIndex: 10,
+     backBtn: {
+    marginBottom: 18,
+    alignSelf: 'flex-start',
     },
-    backText: {
-        fontSize: 16,
-        color: '#6b4eff', // Kept original color or you can change to #007AFF if preferred
-    },
+    
     headerBox: {
         textAlign: 'center',
         marginBottom: 16,
