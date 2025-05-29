@@ -100,7 +100,7 @@ export default function ReviewDetailScreen() {
             ))}
 
             <View style={styles.aiBox}>
-                <Text style={styles.aiTitle}>🤖 AI 사서의 응답</Text>
+                <Text style={styles.aiTitle}>📢 AI 사서의 응답</Text>
                 <Text style={styles.aiResponse}>{review.aiResponse}</Text>
             </View>
         </ScrollView>
