@@ -13,13 +13,15 @@ export default function MyPageScreen() {
   const fetchUserInfo = async () => {
     try {
       const token = await SecureStore.getItemAsync('accessToken');
-      const res = await axios.get('http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/info/simple', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setNickname(res.data.data.nickName);
-      setRank(res.data.data.rank);
+      if (token) { // 토큰이 있을 때만 요청하도록 조건 유지 (안정성)
+        const res = await axios.get('http://ceprj.gachon.ac.kr:60001/api/api/v1/mypage/info/simple', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setNickname(res.data.data.nickName);
+        setRank(res.data.data.rank);
+      }
     } catch (error) {
       console.error('❌ 사용자 정보 불러오기 실패:', error);
     }
@@ -41,8 +43,26 @@ export default function MyPageScreen() {
   );
 
   const handleLogout = async () => {
-    await SecureStore.deleteItemAsync('accessToken');
-    router.replace('/login');
+    try {
+      const token = await SecureStore.getItemAsync('accessToken');
+      if (token) {
+        // 서버 로그아웃 API 호출
+        await axios.post('http://ceprj.gachon.ac.kr:60001/api/api/v1/member/logout', {}, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('✅ 서버 로그아웃 성공');
+      }
+    } catch (error) {
+      console.error('❌ 서버 로그아웃 실패:', error);
+      // 서버 로그아웃 실패 시에도 클라이언트 측 토큰은 삭제하는 것이 좋습니다.
+      // 필요하다면 사용자에게 오류 메시지를 보여줄 수 있습니다.
+    } finally {
+      // 항상 클라이언트 측 토큰을 삭제합니다.
+      await SecureStore.deleteItemAsync('accessToken');
+      router.replace('/login'); // 로그인 페이지로 리다이렉트
+    }
   };
 
   return (
